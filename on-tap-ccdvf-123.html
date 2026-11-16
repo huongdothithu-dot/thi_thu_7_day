@@ -718,7 +718,7 @@ function courseHome() {
       <p class="lead">${COURSE_Q.length} câu luyện tập chia thành ${COURSE_CH.length} chương theo chủ đề. Mỗi chương có <b>quy tắc cần nhớ</b>, bài <b>câu dễ</b> (không có phương án gây nhiễu, hoặc đề/đáp án ngắn dễ nhớ) và bài <b>câu khó</b>. Thứ tự câu và đáp án được đảo mỗi lần mở.</p>
       <ul class="herofacts"><li><b>${COURSE_Q.length}</b>câu</li><li><b>${COURSE_CH.length}</b>chương</li><li><b>${COURSE_Q.filter(cIsEasy).length}</b>câu dễ</li><li><b>${COURSE_Q.filter(q => !cIsEasy(q)).length}</b>câu khó</li><li><b>${cSum(C_LESSONS).k}/${C_LESSONS.length}</b>bài đã học</li></ul>
       <div class="actions">
-        ${last ? `<button class="btn primary" ${cAttr({ v: "q", l: last.id, i: Math.min(CS.last.i, last.ns.length - 1) })}>Học tiếp: Chương ${last.ch.id} · ${esc(last.name)}</button>` : `<button class="btn primary" ${cAttr({ v: "ch", c: 1 })}>Bắt đầu Chương 1</button>`}
+        ${last ? `<button class="btn primary" ${cAttr({ v: "q", l: last.id, i: Math.min(CS.last.i, cOrder[last.id].length - 1) })}>Học tiếp: Chương ${last.ch.id} · ${esc(last.name)}</button>` : `<button class="btn primary" ${cAttr({ v: "ch", c: 1 })}>Bắt đầu Chương 1</button>`}
         <button class="btn" id="cshuffle">Đảo lại câu và đáp án</button>
         ${cHlBtn()}
         <button class="btn" id="coursehome">Về trang thi thử</button>
@@ -830,7 +830,7 @@ function courseSummary(l) {
 }
 function courseView() {
   if (cpos.v === "ch") return courseChapter(cpos.c);
-  if (cpos.v === "q" && C_LB[cpos.l]) return courseQuestion(C_LB[cpos.l], Math.max(0, Math.min(cpos.i, C_LB[cpos.l].ns.length - 1)));
+  if (cpos.v === "q" && C_LB[cpos.l]) return courseQuestion(C_LB[cpos.l], Math.max(0, Math.min(cpos.i, cOrder[cpos.l].length - 1)));
   if (cpos.v === "sum" && C_LB[cpos.l]) return courseSummary(C_LB[cpos.l]);
   return courseHome();
 }
@@ -877,7 +877,7 @@ function courseKey(e) {
   const k = e.key.toUpperCase(), idx = "12345".includes(k) && k.length === 1 ? "12345".indexOf(k) : k.length === 1 ? C_LET.indexOf(k) : -1;
   const n = cOrder[l.id][cpos.i];
   if (idx >= 0 && A(l)[n] == null && cPerm[n][idx] != null) { e.preventDefault(); cAnswer(cPerm[n][idx]); }
-  else if (e.key === "ArrowRight") { e.preventDefault(); cGo(cpos.i < l.ns.length - 1 ? { v: "q", l: l.id, i: cpos.i + 1 } : { v: "sum", l: l.id }); }
+  else if (e.key === "ArrowRight") { e.preventDefault(); cGo(cpos.i < cOrder[l.id].length - 1 ? { v: "q", l: l.id, i: cpos.i + 1 } : { v: "sum", l: l.id }); }
   else if (e.key === "ArrowLeft" && cpos.i > 0) { e.preventDefault(); cGo({ v: "q", l: l.id, i: cpos.i - 1 }); }
 }
 
