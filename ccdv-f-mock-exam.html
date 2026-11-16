@@ -150,39 +150,6 @@ table.kv tr + tr th { border-top: 1px solid var(--line); }
 .pq .acts { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
 .empty { text-align: center; padding: 40px 0; color: var(--muted); }
 
-
-/* Course */
-.chead { padding: 4px 0 0; }
-.eyebrow2 { font: 600 14px var(--sans); color: var(--muted); }
-.ctitle { font-size: clamp(26px, 4vw, 34px); margin-top: 4px; }
-.cfacts { display: flex; flex-wrap: wrap; gap: 6px 22px; margin-top: 12px; color: var(--muted); font-size: 16px; }
-.cfacts b { font: 600 19px var(--display); color: var(--ink); margin-right: 6px; }
-.cacts { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
-.rules { margin: 0; padding-left: 22px; font-size: 17px; }
-.rules li { margin: 8px 0; }
-.rules li::marker { font-weight: 700; color: var(--accent); }
-.kwgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; margin-top: 14px; align-items: start; }
-.kwcard h3 { font-size: 18px; }
-.kwl { list-style: none; margin: 0; padding: 0; font-size: 15px; }
-.kwl li { display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; gap: 2px 8px; padding: 7px 0; border-top: 1px solid var(--line); align-items: baseline; }
-.kwl li:first-child { border-top: 0; }
-.kwm { font-weight: 700; } .kwm.bad { color: var(--bad); } .kwm.good { color: var(--good); } .kwm.warn { color: var(--warn); }
-.kww { font-weight: 600; overflow-wrap: anywhere; }
-.kwy { grid-column: 2; font-size: 14px; }
-.kwl .tag { grid-column: 3; grid-row: 1; }
-.band { background: var(--accent-soft); border-radius: 10px; padding: 10px 14px; margin: -6px -8px 14px; font-size: 15px; color: var(--muted); }
-.band b { color: var(--ink); font-size: 16px; display: block; }
-mark { padding: 0 2px; border-radius: 3px; color: inherit; }
-mark.y { background: #ffe58a; }
-mark.g { background: #9fdcb8; font-weight: 600; }
-mark.r { background: transparent; color: var(--bad); font-weight: 600; text-decoration: underline wavy #e7a29d; text-underline-offset: 3px; }
-.choice .orig { display: inline-block; margin-left: 8px; font: 600 12px var(--sans); color: var(--muted); background: var(--sunken); border-radius: 99px; padding: 0 7px; vertical-align: 1px; }
-.choice .lbl { flex: none; margin-left: auto; font: 700 13px var(--sans); white-space: nowrap; padding-left: 8px; }
-.choice .lbl.good { color: var(--good); } .choice .lbl.bad { color: var(--bad); }
-.choice.dim { opacity: .75; }
-.cuebox { margin-top: 14px; background: var(--good-soft); border: 1px solid #b6e2c7; color: #0d5a32; border-radius: 10px; padding: 10px 14px; font-size: 16px; }
-.practice { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
-
 @media (max-width: 860px) {
   .exam { grid-template-columns: 1fr; }
   .side { position: static; }
@@ -199,6 +166,8 @@ mark.r { background: transparent; color: var(--bad); font-weight: 600; text-deco
 }
 @media print { .tabs, .bar, .tools, .filters { display: none !important; } }
 </style>
+</head>
+<body>
 <style>
 .examtabs { background: #0c1628; border-bottom: 1px solid #2a3a58; font-family: "Lexend", "Segoe UI", Roboto, Arial, sans-serif; }
 .examtabs .in { max-width: 1160px; margin: 0 auto; padding: 8px max(16px, env(safe-area-inset-left, 0px)); display: flex; gap: 6px; align-items: center; overflow-x: auto; }
@@ -207,10 +176,9 @@ mark.r { background: transparent; color: var(--bad); font-weight: 600; text-deco
 .examtabs a:hover { background: #24375a; color: #fff; }
 .examtabs a[aria-current="page"] { background: #fff; color: #14233d; }
 @media print { .examtabs { display: none; } }
+.examtabs .sep { width: 1px; align-self: stretch; background: #2a3a58; margin: 2px 10px; flex: none; }
 </style>
-</head>
-<body>
-<nav class="examtabs" aria-label="Chọn kỳ thi"><div class="in"><span class="lb">Kỳ thi:</span><a href="ccar-f-mock-exam.html">CCAR-F</a><a href="ccdv-f-mock-exam.html" aria-current="page">CCDV-F</a></div></nav>
+<nav class="examtabs" aria-label="Chọn kỳ thi"><div class="in"><span class="lb">Kỳ thi:</span><a href="ccar-f-mock-exam.html">CCAR-F</a><a href="ccdv-f-mock-exam.html" aria-current="page">CCDV-F</a><span class="sep"></span><span class="lb">CCDV-F:</span><a href="ccdv-f-mock-exam.html" aria-current="page">Thi thử</a><a href="on-tap-ccdvf-123.html">Khóa ôn 123 câu</a></div></nav>
 <header class="hero" id="hero">
   <div class="wrap">
     <div class="kicker">Luyện thi chứng chỉ · Đề luyện tập không chính thức</div>
@@ -224,7 +192,7 @@ mark.r { background: transparent; color: var(--bad); font-weight: 600; text-deco
     </div>
     <div class="tabs" role="tablist" aria-label="Chế độ">
       <button class="tab" role="tab" id="tab-exam" aria-controls="panel-exam" aria-selected="true">Thi thử <span class="pill" id="pill-exam">3 đề</span></button>
-      <button class="tab" role="tab" id="tab-study" aria-controls="panel-study" aria-selected="false">Khóa ôn 123 câu <span class="pill" id="pill-study">0 bài</span></button>
+      <a class="tab" id="tab-study" href="on-tap-ccdvf-123.html" style="text-decoration:none">Khóa ôn 123 câu <span class="pill" id="pill-study">Chưa học</span></a>
     </div>
   </div>
 </header>
@@ -237,16 +205,6 @@ mark.r { background: transparent; color: var(--bad); font-weight: 600; text-deco
     <span class="timer" id="timer" aria-live="off"></span>
     <button class="btn small" id="bar-exit">Tạm dừng</button>
     <button class="btn small primary" id="bar-submit">Nộp bài</button>
-  </div>
-</div>
-
-<div class="bar" id="cbar" hidden>
-  <div class="wrap">
-    <span class="ttl" id="cbar-title"></span>
-    <span class="prog" id="cbar-prog"></span>
-    <span class="sp"></span>
-    <button class="btn small" id="cbar-hl"></button>
-    <button class="btn small" id="cbar-back">Về chương</button>
   </div>
 </div>
 
@@ -301,21 +259,22 @@ const SETS = {
 /* ---------- tabs ---------- */
 function setTab(t) {
   S.tab = t; save();
-  for (const [name, id] of [["exam", "tab-exam"], ["study", "tab-study"]]) {
-    const on = name === t;
-    $("#" + id).setAttribute("aria-selected", on);
-    $("#panel-" + name).hidden = !on;
-  }
-  updateBar(); updateCBar();
+  $("#tab-exam").setAttribute("aria-selected", true);
+  $("#panel-study").hidden = true;
+  updateBar();
   if (t === "study") renderStudy(); else renderExam();
 }
 $("#tab-exam").onclick = () => setTab("exam");
-$("#tab-study").onclick = () => setTab("study");
-$(".tabs").addEventListener("keydown", e => {
-  if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
-  const t = S.tab === "exam" ? "study" : "exam"; setTab(t); $("#tab-" + t).focus();
-});
 
+function courseStatus() {
+  let c = null; try { c = JSON.parse(localStorage.getItem("ccdvf-course")); } catch (e) {}
+  const res = Object.values((c && c.res) || {}), nl = (c && c.nl) || 0;
+  if (!res.length) return { cls: "", text: `Chưa học · ${QUESTIONS.length} câu`, pill: "Chưa học" };
+  const R = res.reduce((s, x) => s + x.r, 0), N = res.reduce((s, x) => s + x.n, 0);
+  const done = nl && res.length >= nl;
+  return { cls: done ? (R / N >= .7 ? "pass" : "fail") : "", text: `${res.length}/${nl || "?"} bài · đúng ${R}/${N}`, pill: `${res.length}/${nl || "?"} bài` };
+}
+function updatePills() { $("#pill-study").textContent = courseStatus().pill; }
 
 /* ================= EXAM TAB ================= */
 let view = "home"; // home | run | result
@@ -369,14 +328,11 @@ function renderHome() {
     h("span", { class: "muted", style: "font-size:15px" }, "Thứ tự đáp án A–E giữ nguyên để khớp với phần giải thích.")));
 
   const cst = courseStatus();
-  P.append(h("h2", { class: "section-title", style: "margin-top:26px" }, "Ôn tập"),
-    h("div", { class: "practice" },
-      h("button", { class: "set", onclick: () => { sv = { v: "home" }; setTab("study"); window.scrollTo(0, 0); } },
+  P.append(h("h2", { class: "section-title", style: "margin-top:26px" }, "Practice"),
+    h("div", { class: "sets" },
+      h("a", { class: "set", href: "on-tap-ccdvf-123.html", style: "text-decoration:none" },
         h("h3", {}, `Khóa ôn ${QUESTIONS.length} câu`), h("span", { class: "st " + cst.cls }, cst.text),
-        h("span", { class: "desc" }, `${CHAPTERS.length} chương · câu dễ & câu khó · đảo câu và đáp án`)),
-      h("button", { class: "set", onclick: () => { sv = { v: "list" }; setTab("study"); window.scrollTo(0, 0); } },
-        h("h3", {}, "Danh sách 123 câu"), h("span", { class: "st" }, "Tìm kiếm · lọc · xem đáp án ngay"),
-        h("span", { class: "desc" }, "Tra nhanh mọi câu và giải thích"))));
+        h("span", { class: "desc" }, "6 chương · câu dễ & câu khó · đảo câu và đáp án"))));
   // info + history
   const hist = [];
   for (const key of Object.keys(SETS)) for (const r of (S.results[key] || [])) hist.push({ key, ...r });
@@ -560,10 +516,10 @@ function reviewCard(q, sel, label, flagged, domId) {
 /* ================= STUDY TAB ================= */
 const F = { q: "", set: "all", st: "all" };
 let studyBuilt = false;
-function renderList() {
+function renderStudy() {
   const P = $("#panel-study");
   if (!studyBuilt) {
-    studyBuilt = true; P.replaceChildren(h("button", { class: "btn", style: "margin-bottom:6px", onclick: () => cGo({ v: "home" }) }, "← Về khóa ôn"));
+    studyBuilt = true;
     const search = h("input", { type: "search", placeholder: "Tìm nội dung hoặc số câu…", "aria-label": "Tìm câu hỏi" });
     search.oninput = () => { F.q = search.value.trim().toLowerCase(); drawList(); };
     const setSel = h("select", { "aria-label": "Lọc theo đề" }, h("option", { value: "all" }, "Cả 2 đề"), h("option", { value: "1" }, "Set 1 (60)"), h("option", { value: "2" }, "Set 2 (63)"));
@@ -669,441 +625,11 @@ function drawProg() {
     h("span", {}, "Sai ", h("b", { style: "color:var(--bad)" }, String(vals.length - right))));
 }
 
-/* ================= COURSE (tab Ôn tập) ================= */
-const CHAPTERS = [
-  { id: 1, title: "Kiến trúc agent & multi-agent", rules: [
-    "Các bước <b>đã biết, lặp lại</b> → workflow / chuỗi prompt cố định; chỉ gọi agent ở <b>điểm cần quyết định</b>. Vấn đề <b>chưa biết lời giải</b> → lập kế hoạch thích ứng theo những gì phát hiện được.",
-    "Việc lớn tách được thành phần <b>độc lập</b> → orchestrator + subagent chuyên biệt; giao cho mỗi subagent <b>mục tiêu, định dạng đầu ra, tool/nguồn, ranh giới</b> rõ ràng. Sửa đổi <b>phụ thuộc chặt</b> nhau (đổi kiểu dùng ở 46 file) → để một agent làm trong một context.",
-    "Bàn giao giữa các agent phải <b>có cấu trúc</b> (path, symbol, line range, evidence; manifest trích dẫn) và <b>chặn bước sau</b> cho tới khi bước trước trả đủ.",
-    "Vòng lặp agent: đọc <code>stop_reason</code>, ghép đúng <code>tool_use_id</code> ↔ <code>tool_result</code>, trả lại assistant turn <b>nguyên vẹn</b> (cả block thinking); <code>pause_turn</code> → gửi lại y nguyên với cùng tools. Nhiều tool_use → trả <b>tất cả</b> tool_result trong một user message (tool bị từ chối thì <code>is_error</code>).",
-    "Việc dài / nhiều phiên → <b>checkpoint</b>, file tiến độ + git log, SessionStore bền vững để resume.",
-    "Phải đảm bảo 100% (test phải pass) → <b>Stop hook</b> / kiểm tra bằng code, không chỉ dặn trong prompt. Tự review trong cùng phiên dễ bỏ sót → subagent <b>context mới</b> review diff.",
-    "Danh tính khách hàng không chắc chắn → hỏi thêm thông tin để xác định, <b>không đoán</b>."
-  ] },
-  { id: 2, title: "Thiết kế tool & MCP", rules: [
-    "Model chọn sai tool → viết lại <b>mô tả tool</b>: làm gì, khi nào dùng, tham số nghĩa là gì; gộp / bỏ tool trùng chức năng. Đừng xoá mô tả vì tên đã rõ.",
-    "Schema <b>chặt</b> (required đúng thực tế, enum), <b>validate tham số trước khi chạy</b>, trả <b>lỗi có cấu trúc</b> (loại lỗi, có retry được không, thông tin an toàn cho user).",
-    "MCP: workflow người dùng chọn từ menu → <b>prompt</b>; dữ liệu để đọc → <b>resource</b>; hành động có tác động → <b>tool</b>. Server chạy local cho Claude Code → <b>STDIO</b>.",
-    "Built-in đáp ứng được thì dùng built-in; cần dùng lại cho nhiều team → <b>Skill</b> hoặc <b>MCP server</b>. Chọn theo phạm vi, nhu cầu tái sử dụng và ngữ cảnh tích hợp.",
-    "Kết quả tool lệch định dạng → chuẩn hoá bằng <b>PostToolUse hook</b>. Dữ liệu không tin cậy → trả qua <code>tool_result</code> có nhãn, <b>không</b> dán vào system prompt. Kiểm tra ID thuộc đúng user đã xác thực.",
-    "Cần web search mà không có hạ tầng → <b>web search server tool</b> với <code>allowed_domains</code>."
-  ] },
-  { id: 3, title: "Prompt, structured output & đánh giá", rules: [
-    "Structured output: định nghĩa schema, yêu cầu đúng schema, <b>validate trước khi chuyển xuống downstream</b>. Validate lỗi → retry / sửa / fallback, không làm hỏng cả request.",
-    "Response có thể bị cắt (<code>max_tokens</code>) hoặc bị từ chối → đọc <code>stop_reason</code>, đối chiếu schema, gọi lại (tăng max_tokens nếu bị cắt).",
-    "Trường có thể không có → cho phép <code>null</code> và nói rõ khi nào trả null, đừng để model bịa \"N/A\".",
-    "Few-shot: <b>3–5 ví dụ đa dạng</b> trong thẻ <code>&lt;example&gt;</code>; một ví dụ duy nhất khiến model bắt chước cả số lượng lẫn nội dung.",
-    "Sửa prompt dựa trên <b>bộ eval</b> (case thật + lỗi cũ, chấm tự động), không vá từng khiếu nại. Quản lý prompt như code: một nguồn duy nhất, version control.",
-    "Giải thích <b>lý do / ngữ cảnh</b> thay vì chỉ cấm bằng \"NEVER\". claude.ai có system prompt (ngày hôm nay…) còn API thì không.",
-    "Đổi model → điều chỉnh prompt rồi <b>đánh giá lại</b>. Thinking trên model mới → <b>adaptive thinking</b> thay vì budget thủ công."
-  ] },
-  { id: 4, title: "Context, caching, chi phí & chọn model", rules: [
-    "Hội thoại / agent dài, model lạc đề hoặc quên ràng buộc → <b>compaction</b>, tóm tắt hoặc cắt bớt output tool cũ, giữ lại ràng buộc quan trọng. Context đủ chỗ không có nghĩa là model chú ý đủ.",
-    "Phần đầu prompt lặp lại mỗi lần gọi → <b>prompt caching</b>. Prefix phải <b>giống từng byte</b>: không chèn timestamp phía trên phần được cache.",
-    "Đọc usage: <code>input_tokens</code> chỉ tính phần <b>sau</b> breakpoint; cộng thêm <code>cache_creation_input_tokens</code> và <code>cache_read_input_tokens</code>. Batch xử lý lâu → cache <code>ttl: 1h</code>.",
-    "Đổi model → <b>đếm lại token</b> bằng endpoint đếm token với model mới (tokenizer có thể khác).",
-    "Chi phí: theo dõi token <b>theo tính năng</b>; ước lượng = số request × (token vào × giá vào + token ra × giá ra).",
-    "Chọn model: hỏi mục tiêu <b>chất lượng, độ trễ, chi phí</b> trước. Việc đơn giản không cần tier cao hay effort tối đa."
-  ] },
-  { id: 5, title: "Claude Code: cấu hình & quyền", rules: [
-    "Chuẩn chung cho mọi repo → <b>CLAUDE.md theo cấp</b> (user / project / thư mục), không nhân bản hướng dẫn.",
-    "Chạy trong CI → <b>headless mode</b> với quyền cấu hình sẵn trong <code>settings.json</code>.",
-    "Quyền: <b>deny ở bất kỳ cấp nào cũng thắng</b>, kể cả khi settings.local.json có allow. Lint/test → allow, deploy → ask. Chính sách toàn công ty → <b>managed settings</b> (file hoặc MDM).",
-    "Hook cho kiểm tra bắt buộc; matcher tool MCP viết dạng regex <code>mcp__server__.*</code>.",
-    "Phiên dài lẫn nhiều chủ đề, đề xuất sai lặp lại → <code>/clear</code> và bắt đầu lại với prompt cụ thể hơn."
-  ] },
-  { id: 6, title: "Vận hành, bảo mật & production", rules: [
-    "Lỗi API: retry <b>lỗi tạm thời</b> (429, 500, 529) với backoff; <b>fail nhanh</b> với 400, 401, 413… SDK đã có retry mặc định cho nhiều lỗi tạm thời.",
-    "Bí mật → <b>secrets manager</b> / cấu hình theo môi trường, không hardcode, không commit.",
-    "Input không tin cậy → validate, sanitize và coi là <b>dữ liệu</b>, không phải chỉ dẫn. Threat model AI: prompt injection, rò rỉ dữ liệu, jailbreak, output không an toàn.",
-    "Model, prompt, plugin, cấu hình → <b>version control</b>, theo dõi phiên bản theo từng môi trường.",
-    "Không có nhu cầu đa nhà cung cấp → tích hợp <b>trực tiếp qua SDK</b>. Service bất đồng bộ → async client. Cần đọc header → <code>with_raw_response</code>. List API có phân trang → lặp theo <code>has_more</code> / <code>after_id</code>.",
-    "Câu hỏi \"inspect FIRST\" → chọn bằng chứng nằm <b>đúng lớp gây lỗi</b> (trace, timeline, log, phiên bản tài liệu…). Sau khi ship → vận hành: giám sát, xử lý sự cố, cải tiến."
-  ] }
-];
-const KW_GROUPS = [
-  ["on the grounds that", "Biện minh kiểu \"on the grounds that…\"", /on the grounds that/i],
-  ["so that …", "Phương án kèm lời hứa \"so that …\"", /\bso that\b/i],
-  ["separate …", "Tách ra một thứ \"separate\" riêng", /\bseparate\b/i],
-  ["without …", "Bỏ bớt bước: \"without …\"", /\bwithout\b/i],
-  ["during normal operation", "\"during normal operation\"", /normal operation/i],
-  ["increase · raise", "Tăng giới hạn / tham số", /\bincrease\b|\braise\b/i],
-  ["entirely · across all · every turn", "Làm tuyệt đối", /\bentirely\b|across all|every turn/i],
-  ["ignore", "Bỏ qua lỗi / cảnh báo", /\bignor(e|es|ing)\b/i],
-  ["tell · telling Claude", "Chỉ dặn thêm trong prompt", /\btell(ing)?\b/i],
-  ["documentation", "Viết tài liệu thay vì sửa", /\bdocumentation\b/i],
-  ["switch · larger · more capable model", "Đổi / nâng model thay vì sửa thiết kế", /\bswitch(es|ing)?\b|\blarger\b|more capable|upgrade/i],
-  ["manually", "Làm thủ công", /\bmanual(ly)?\b/i],
-  ["validate", "Validate đầu vào / đầu ra", /\bvalidat(e|es|ing)\b/i],
-  ["Apply … (đầu câu)", "Mở đầu bằng \"Apply …\"", /^apply\b/i],
-  ["structured error", "Lỗi có cấu trúc", /structured (mcp )?error/i],
-  ["against the schema", "Đối chiếu với schema", /against (the|its|a) (\w+ )?schema/i],
-  ["eval · test set · dataset", "Bộ eval / test", /\beval|test set|dataset|benchmark/i],
-  ["stop_reason", "Đọc stop_reason", /stop_reason/i],
-  ["retry · backoff", "Retry / backoff", /\bretr(y|ies|ying)\b|backoff/i],
-  ["cache · caching", "Prompt caching", /\bcach(e|ing|ed)\b/i],
-  ["compaction · summarize", "Tóm tắt / compaction", /compaction|summari[sz]/i],
-  ["tool description", "Mô tả tool", /description/i],
-  ["hook", "Hook", /\bhooks?\b/i],
-  ["subagent", "Subagent", /subagent/i],
-  ["human · approval", "Người duyệt", /\bhuman\b|approv/i],
-  ["CLAUDE.md", "CLAUDE.md", /claude\.md/i],
-  ["examples · few-shot", "Thêm ví dụ", /few-shot|\bexamples?\b/i],
-  ["temperature", "Chỉnh temperature", /temperature/i]
-];
-function kwStats(qs) {
-  return KW_GROUPS.map(([w, why, re]) => {
-    let r = 0, n = 0;
-    qs.forEach(q => q.o.forEach((o, i) => { if (re.test(o)) { n++; if (q.a.includes(i)) r++; } }));
-    return { w, why, re, r, n };
-  });
-}
-const KW_ALL = kwStats(QUESTIONS);
-const KW_DROP = KW_ALL.filter(k => k.r === 0 && k.n >= 3);
-const C_PART = 10;
-const C_LESSONS = [];
-CHAPTERS.forEach(c => {
-  c.lessons = [];
-  const add = (cat, name, ns) => {
-    if (!ns.length) return;
-    const parts = Math.ceil(ns.length / C_PART), size = Math.ceil(ns.length / parts);
-    for (let p = 0; p < parts; p++) {
-      const l = { id: `${c.id}${cat}${p}`, ch: c, cat, name: name + (parts > 1 ? ` · phần ${p + 1}` : ""), ns: ns.slice(p * size, (p + 1) * size) };
-      c.lessons.push(l); C_LESSONS.push(l);
-    }
-  };
-  add("E", "Câu dễ", QUESTIONS.filter(q => q.ch === c.id && q.cat === "E").map(q => q.id));
-  add("T", "Câu khó", QUESTIONS.filter(q => q.ch === c.id && q.cat === "T").map(q => q.id));
-});
-const C_LB = Object.fromEntries(C_LESSONS.map(l => [l.id, l]));
-S.course = Object.assign({ ans: {}, res: {}, hl: true, last: null }, S.course || {});
-const CS = S.course;
-let sv = { v: "home" }, cOrder = {}, cPerm = {}, cRound = {}, cPending = {}, cFilter = "all";
-const A = l => (CS.ans[l.id] = CS.ans[l.id] || {});
-function cMakeOrder(l) { return shuffled(l.ns); }
-function cShuffle() {
-  cRound = {}; cPending = {};
-  C_LESSONS.forEach(l => { cOrder[l.id] = cMakeOrder(l); });
-  QUESTIONS.forEach(q => { cPerm[q.id] = shuffled(q.o.map((_, i) => i)); });
-}
-cShuffle();
-const cDone = l => l.ns.filter(n => A(l)[n]).length;
-const cRightN = l => l.ns.filter(n => isRight(byId.get(n), A(l)[n])).length;
-function cRes(l) { return CS.res[l.id] || (cDone(l) === l.ns.length ? { r: cRightN(l), n: l.ns.length } : null); }
-function cSum(lessons) {
-  let k = 0, R = 0, N = 0;
-  lessons.forEach(l => { const x = cRes(l); if (x) { k++; R += x.r; N += x.n; } });
-  return { k, R, N, all: lessons.length };
-}
-function cSumStatus(lessons, total) {
-  const t = cSum(lessons);
-  if (!t.k) return { cls: "", text: `Chưa học · ${total} câu` };
-  return { cls: t.k === t.all ? (t.R / t.N >= .7 ? "pass" : "fail") : "", text: `${t.k}/${t.all} bài · đúng ${t.R}/${t.N}` };
-}
-const courseStatus = () => cSumStatus(C_LESSONS, QUESTIONS.length);
-function cLessonStatus(l) {
-  const d = cDone(l), x = CS.res[l.id];
-  if (d && d < l.ns.length) return { cls: "run", text: `Đang học ${d}/${l.ns.length}` + (x ? ` · lần trước đúng ${x.r}/${x.n}` : "") };
-  const y = cRes(l);
-  if (y) return { cls: y.r / y.n >= .7 ? "pass" : "fail", text: `Lần gần nhất: đúng ${y.r}/${y.n}` };
-  return { cls: "", text: `Chưa học · ${l.ns.length} câu` };
-}
-function updatePills() {
-  const t = cSum(C_LESSONS);
-  $("#pill-study").textContent = `${t.k}/${t.all} bài`;
-}
-
-/* text highlighting */
-const TOK_RE = /[a-z0-9_][a-z0-9_.'\-]*[a-z0-9_]|[a-z0-9]/g;
-function cueSpan(text, cue) {
-  const toks = [...text.toLowerCase().matchAll(TOK_RE)];
-  if (!toks.length) return null;
-  const k = Math.min(cue.w, toks.length);
-  const a = cue.k === "head" ? toks[0] : toks[toks.length - k];
-  const b = cue.k === "head" ? toks[k - 1] : toks[toks.length - 1];
-  return [a.index, b.index + b[0].length];
-}
-function marked(text, ranges) {
-  ranges = ranges.filter(Boolean).sort((x, y) => x[0] - y[0]);
-  const out = []; let pos = 0;
-  for (const [s, e, cls] of ranges) {
-    if (s < pos) continue;
-    if (s > pos) out.push(text.slice(pos, s));
-    out.push(h("mark", { class: cls }, text.slice(s, e)));
-    pos = e;
-  }
-  out.push(text.slice(pos));
-  return out;
-}
-function regexRanges(text, re, cls) {
-  const g = new RegExp(re.source, re.flags.includes("g") ? re.flags : re.flags + "g"), out = [];
-  for (const m of text.matchAll(g)) if (m[0]) out.push([m.index, m.index + m[0].length, cls]);
-  return out;
-}
-const escRe = s => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-function stemNodes(q) {
-  if (!CS.hl || !q.kw.length) return [q.q];
-  const r = [];
-  q.kw.forEach(w => r.push(...regexRanges(q.q, new RegExp(`\\b${escRe(w)}\\b`, "i"), "y")));
-  return marked(q.q, r);
-}
-function cueText(q, i) {
-  const c = q.cue[i]; if (!c) return "";
-  const sp = cueSpan(q.o[i], c); return sp ? q.o[i].slice(sp[0], sp[1]) : "";
-}
-
-/* navigation */
-function cGo(pos) {
-  if (pos.fresh && C_LB[pos.l]) {
-    const l = C_LB[pos.l];
-    l.ns.forEach(n => { delete A(l)[n]; delete cPending[n]; cPerm[n] = shuffled(byId.get(n).o.map((_, i) => i)); });
-    cOrder[l.id] = cMakeOrder(l); cRound[l.id] = 0;
-    pos = { v: "q", l: l.id, i: 0 };
-  }
-  sv = pos; cFilter = "all";
-  if (pos.v === "q") CS.last = { l: pos.l, i: pos.i };
-  save(); renderStudy(); window.scrollTo(0, 0);
-}
-function cAnswer(l, n, sel) {
-  A(l)[n] = sel.slice().sort();
-  if (!cRound[l.id] && cDone(l) === l.ns.length) CS.res[l.id] = { r: cRightN(l), n: l.ns.length, at: Date.now() };
-  save(); updatePills(); renderStudy();
-}
-function cLoop(l) {
-  const redo = l.ns.filter(n => !isRight(byId.get(n), A(l)[n]));
-  if (!redo.length) return;
-  redo.forEach(n => { delete A(l)[n]; cPerm[n] = shuffled(byId.get(n).o.map((_, i) => i)); });
-  cOrder[l.id] = shuffled(redo);
-  cRound[l.id] = (cRound[l.id] || 0) + 1;
-  cGo({ v: "q", l: l.id, i: 0 });
-}
-
-function renderStudy() {
-  updateCBar();
-  if (sv.v === "list") return renderList();
-  studyBuilt = false;
-  const P = $("#panel-study"); P.replaceChildren();
-  if (sv.v === "ch" && CHAPTERS.find(c => c.id === sv.c)) return courseChapter(P, sv.c);
-  if (sv.v === "q" && C_LB[sv.l]) return courseQuestion(P, C_LB[sv.l], Math.max(0, Math.min(sv.i, cOrder[sv.l].length - 1)));
-  if (sv.v === "sum" && C_LB[sv.l]) return courseSummary(P, C_LB[sv.l]);
-  sv = { v: "home" }; courseHome(P);
-}
-function updateCBar() {
-  const on = S.tab === "study" && sv.v === "q" && C_LB[sv.l];
-  $("#cbar").hidden = !on;
-  if (S.tab === "study") $("#hero").hidden = !!on;
-  if (!on) return;
-  const l = C_LB[sv.l], ord = cOrder[l.id];
-  $("#cbar-title").textContent = `Khóa ôn · Chương ${l.ch.id}`;
-  $("#cbar-prog").textContent = `Câu ${sv.i + 1}/${ord.length} · đã làm ${ord.filter(n => A(l)[n]).length}`;
-  $("#cbar-hl").textContent = `Tô vàng/đỏ: ${CS.hl ? "Bật" : "Tắt"}`;
-  $("#cbar-hl").setAttribute("aria-pressed", !!CS.hl);
-}
-$("#cbar-hl").onclick = () => { CS.hl = !CS.hl; save(); renderStudy(); };
-$("#cbar-back").onclick = () => cGo({ v: "ch", c: C_LB[sv.l].ch.id });
-
-function headBlock(P, eyebrow, title, facts, actions, lead) {
-  P.append(h("div", { class: "chead" },
-    h("div", { class: "eyebrow2" }, eyebrow),
-    h("h2", { class: "ctitle" }, title),
-    lead ? h("p", { class: "muted", style: "max-width:760px;font-size:17px;margin-top:6px" }, lead) : null,
-    facts ? h("div", { class: "cfacts" }, facts.map(([b, t]) => h("span", {}, h("b", {}, String(b)), t))) : null,
-    actions ? h("div", { class: "cacts" }, actions) : null));
-}
-function hlBtn() {
-  return h("button", { class: "btn", "aria-pressed": !!CS.hl, onclick: () => { CS.hl = !CS.hl; save(); renderStudy(); } }, `Tô vàng/đỏ: ${CS.hl ? "Bật" : "Tắt"}`);
-}
-
-function courseHome(P) {
-  const t = cSum(C_LESSONS), last = CS.last && C_LB[CS.last.l];
-  const easy = QUESTIONS.filter(q => q.cat === "E").length;
-  const cont = last && cDone(last) < last.ns.length && cDone(last) > 0
-    ? h("button", { class: "btn primary", onclick: () => cGo({ v: "q", l: last.id, i: Math.min(CS.last.i, cOrder[last.id].length - 1) }) }, `Học tiếp: Chương ${last.ch.id} · ${last.name}`)
-    : h("button", { class: "btn primary", onclick: () => cGo({ v: "ch", c: 1 }) }, "Bắt đầu Chương 1");
-  headBlock(P, "CCDV-F practice · Khóa ôn", `Khóa ôn ${QUESTIONS.length} câu`,
-    [[QUESTIONS.length, "câu"], [CHAPTERS.length, "chương"], [easy, "câu dễ"], [QUESTIONS.length - easy, "câu khó"], [`${t.k}/${t.all}`, "bài đã học"]],
-    [cont,
-      h("button", { class: "btn", onclick: () => { cShuffle(); renderStudy(); } }, "Đảo lại câu và đáp án"),
-      hlBtn(),
-      h("button", { class: "btn", onclick: () => cGo({ v: "list" }) }, "Danh sách 123 câu")],
-    `${QUESTIONS.length} câu chia thành ${CHAPTERS.length} chương theo chủ đề. Mỗi chương có quy tắc cần nhớ, bài câu dễ (đề và đáp án ngắn, ít nhiễu) và bài câu khó. Thứ tự câu và đáp án được đảo mỗi lần làm.`);
-  P.append(h("h2", { class: "section-title", style: "margin-top:26px" }, "Chọn chương"));
-  P.append(h("div", { class: "sets" }, CHAPTERS.map(c => {
-    const ns = QUESTIONS.filter(q => q.ch === c.id).length, st = cSumStatus(c.lessons, ns);
-    return h("button", { class: "set", onclick: () => cGo({ v: "ch", c: c.id }) },
-      h("h3", {}, `Chương ${c.id}`), h("span", { class: "st " + st.cls }, st.text), h("span", { class: "desc" }, c.title));
-  })));
-  P.append(h("div", { class: "card", style: "margin-top:22px;font-size:16px" },
-    h("b", {}, "Cách học. "),
-    "Đọc quy tắc của chương, làm bài câu dễ rồi tới câu khó. Khi bật tô màu, từ khóa trong đề liên quan tới đáp án đúng được bôi vàng; sau khi trả lời, cụm cần nhớ của đáp án đúng được tô xanh (dòng \"Nhớ đầu\" hoặc \"Nhớ đuôi\": nhớ cụm đầu nếu không đáp án nào khác trong khóa bắt đầu giống vậy, nếu không thì nhớ cụm đuôi), và các từ \"thấy là loại\" trong phương án sai được tô đỏ. Mỗi phương án có nhãn \"gốc A–E\" để đối chiếu với phần giải thích. Làm hết bài mà còn câu sai thì ôn lại các câu sai đến khi đúng hết. Kết quả lần gần nhất của mỗi bài được lưu trong trình duyệt này."));
-}
-
-function kwTable(title, note, rows, mark) {
-  if (!rows.length) return null;
-  return h("div", { class: "card kwcard" },
-    h("h3", {}, title), h("p", { class: "muted", style: "font-size:14px;margin:2px 0 8px" }, note),
-    h("ul", { class: "kwl" }, rows.map(k => h("li", {},
-      h("span", { class: "kwm " + mark[1] }, mark[0]), h("span", { class: "kww" }, k.w),
-      h("span", { class: "muted kwy" }, k.why), h("span", { class: "tag" }, `${k.r}/${k.n}`)))));
-}
-function courseChapter(P, id) {
-  const c = CHAPTERS.find(x => x.id === id), qs = QUESTIONS.filter(q => q.ch === id), s = cSum(c.lessons);
-  const first = c.lessons.find(l => !cRes(l)) || c.lessons[0];
-  headBlock(P, `Khóa ôn · Chương ${id}/${CHAPTERS.length}`, c.title,
-    [[qs.length, "câu"], [c.lessons.length, "bài"], [`${s.k}/${s.all}`, "bài đã học"], [s.R, "câu đúng"]],
-    [h("button", { class: "btn primary", onclick: () => cGo({ v: "q", l: first.id, i: 0, fresh: cDone(first) === 0 || cDone(first) === first.ns.length }) }, s.k ? "Vào bài tiếp theo" : "Vào bài đầu tiên"),
-      h("button", { class: "btn", onclick: () => cGo({ v: "home" }) }, "Về khóa ôn")]);
-  P.append(h("h2", { class: "section-title", style: "margin-top:24px" }, "Bài học"));
-  P.append(h("div", { class: "sets" }, c.lessons.map(l => {
-    const st = cLessonStatus(l), d = cDone(l), resume = d > 0 && d < l.ns.length;
-    return h("button", { class: "set", onclick: () => cGo(resume ? { v: "q", l: l.id, i: Math.max(0, cOrder[l.id].findIndex(n => !A(l)[n])) } : { v: "q", l: l.id, i: 0, fresh: true }) },
-      h("h3", {}, l.name), h("span", { class: "st " + st.cls }, st.text),
-      h("span", { class: "desc" }, l.cat === "E" ? "Câu dễ — đề và đáp án ngắn, ít nhiễu" : "Câu khó — đề dài, đáp án gần nhau, có câu chọn nhiều"));
-  })));
-  P.append(h("h2", { class: "section-title", style: "margin-top:28px" }, "Quy tắc cần nhớ"));
-  const rl = h("ol", { class: "rules" });
-  c.rules.forEach(r => { const li = document.createElement("li"); li.innerHTML = r; rl.append(li); });
-  P.append(h("div", { class: "card" }, rl));
-  const inCh = kwStats(qs).map((k, i) => ({ ...k, all: KW_ALL[i] })).filter(k => k.n > 0);
-  const fmtRow = k => ({ w: k.w, why: k.why, r: k.all.r, n: k.all.n });
-  P.append(h("div", { class: "kwgrid" },
-    kwTable("🚫 Thấy là loại", "Chưa từng là đáp án đúng trong 123 câu. Số = số lần đúng / số lần xuất hiện trong cả khóa.", inCh.filter(k => k.all.r === 0).map(fmtRow), ["✕", "bad"]),
-    kwTable("✅ Thấy là chọn", "Chưa từng nằm ở phương án sai trong 123 câu.", inCh.filter(k => k.all.r === k.all.n).map(fmtRow), ["✓", "good"]),
-    kwTable("⚖️ Hai mặt", "Vừa từng đúng vừa từng là bẫy — phải đọc kỹ tình huống.", inCh.filter(k => k.all.r > 0 && k.all.r < k.all.n).map(fmtRow), ["⚖", "warn"])));
-  const next = CHAPTERS.find(x => x.id === id + 1);
-  P.append(h("div", { style: "display:flex;justify-content:space-between;margin-top:22px;gap:10px;flex-wrap:wrap" },
-    id > 1 ? h("button", { class: "btn", onclick: () => cGo({ v: "ch", c: id - 1 }) }, `← Chương ${id - 1}`) : h("span"),
-    next ? h("button", { class: "btn primary", onclick: () => cGo({ v: "ch", c: id + 1 }) }, `Chương ${id + 1} →`) : h("button", { class: "btn", onclick: () => cGo({ v: "home" }) }, "Về khóa ôn")));
-}
-
-function optionList(q, sel, done, onPick, pending) {
-  const perm = cPerm[q.id], multi = q.k > 1;
-  return perm.map((orig, pos) => {
-    const text = q.o[orig], isA = q.a.includes(orig), picked = (done ? sel : pending).includes(orig);
-    let cls = "choice" + (multi ? " multi" : "");
-    if (done) cls += isA ? " right" : picked ? " wrong" : " dim";
-    const ranges = [];
-    if (done && CS.hl) {
-      if (isA && q.cue[orig]) { const sp = cueSpan(text, q.cue[orig]); if (sp) ranges.push([sp[0], sp[1], "g"]); }
-      if (!isA) KW_DROP.forEach(k => ranges.push(...regexRanges(text, k.re, "r")));
-    }
-    return h("button", { class: cls, "aria-pressed": !done && picked, disabled: done, onclick: () => onPick(orig) },
-      h("span", { class: "L" }, LET[pos]),
-      h("span", { class: "t" }, marked(text, ranges),
-        done ? h("span", { class: "orig" }, `gốc ${LET[orig]}`) : null),
-      done && isA ? h("span", { class: "lbl good" }, "Đáp án đúng") : done && picked ? h("span", { class: "lbl bad" }, "Bạn chọn") : null);
-  });
-}
-function explainBlock(q, sel) {
-  const cues = q.a.map(i => [q.cue[i], cueText(q, i)]).filter(x => x[0] && x[1]);
-  return [
-    cues.length ? h("div", { class: "cuebox" }, cues.map(([c, t]) => h("div", {}, h("b", {}, c.k === "head" ? "Nhớ đầu: " : "Nhớ đuôi: "), t))) : null,
-    h("div", { class: "ex" }, h("span", { class: "k" }, `Đáp án gốc: ${letters(q.a)}${sel && sel.length ? ` · Bạn chọn: ${letters(sel)}` : ""}`), q.e)
-  ];
-}
-function courseQuestion(P, l, i) {
-  const ord = cOrder[l.id], n = ord[i], q = byId.get(n), sel = A(l)[n], done = !!sel, multi = q.k > 1;
-  sv.i = i;
-  const pending = cPending[n] || [];
-  const pick = orig => {
-    if (done) return;
-    if (!multi) return cAnswer(l, n, [orig]);
-    let cur = pending.includes(orig) ? pending.filter(x => x !== orig) : [...pending, orig];
-    if (cur.length >= q.k) { delete cPending[n]; return cAnswer(l, n, cur.slice(0, q.k)); }
-    cPending[n] = cur; renderStudy();
-  };
-  const last = i === ord.length - 1;
-  const card = h("div", { class: "qcard" },
-    h("div", { class: "band" }, h("b", {}, `${l.name} · Chương ${l.ch.id}: ${l.ch.title}`),
-      h("div", {}, cRound[l.id] ? `Vòng ôn câu sai ${cRound[l.id]}` : l.cat === "E" ? "Câu dễ: nhớ cụm đầu hoặc đuôi của đáp án đúng." : "Câu khó: đọc kỹ tình huống, đối chiếu quy tắc của chương.")),
-    h("div", { class: "qhead" },
-      h("span", { class: "no" }, `Câu ${i + 1} · câu gốc #${q.id}`),
-      multi ? h("span", { class: "tag warn" }, `Chọn ${q.k} đáp án`) : null,
-      done ? h("span", { class: "tag " + (isRight(q, sel) ? "good" : "bad") }, isRight(q, sel) ? "Đúng" : "Sai") : null,
-      h("span", { style: "flex:1" }),
-      h("span", { class: "tag " + (l.cat === "E" ? "good" : "warn") }, l.cat === "E" ? "Dễ" : "Khó")),
-    h("p", { class: "stem" }, stemNodes(q)),
-    multi && !done ? h("p", { class: "need" }, `Chọn ${q.k} đáp án (đã chọn ${pending.length}/${q.k}).`) : null,
-    optionList(q, sel || [], done, pick, pending),
-    done ? explainBlock(q, sel) : null,
-    h("div", { class: "qnav" },
-      h("button", { class: "btn", disabled: i === 0, onclick: () => cGo({ v: "q", l: l.id, i: i - 1 }) }, "← Câu trước"),
-      last ? h("button", { class: "btn primary", onclick: () => cGo({ v: "sum", l: l.id }) }, "Xem kết quả bài")
-        : h("button", { class: "btn primary", onclick: () => cGo({ v: "q", l: l.id, i: i + 1 }) }, "Câu tiếp →")));
-  const okN = ord.filter(x => A(l)[x] && isRight(byId.get(x), A(l)[x])).length, badN = ord.filter(x => A(l)[x] && !isRight(byId.get(x), A(l)[x])).length;
-  const side = h("aside", { class: "side" },
-    h("h3", {}, "Danh sách câu"),
-    h("div", { class: "muted", style: "display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px" }, h("span", {}, l.name), h("span", {}, `${i + 1}/${ord.length}`)),
-    h("div", { class: "grid" }, ord.map((x, k) => {
-      const s2 = A(l)[x];
-      return h("button", { class: "cell" + (s2 ? (isRight(byId.get(x), s2) ? " ok" : " no") : "") + (k === i ? " cur" : ""), onclick: () => cGo({ v: "q", l: l.id, i: k }) }, String(k + 1));
-    })),
-    h("div", { class: "legend" },
-      h("span", {}, h("i", { style: "background:var(--good-soft);border-color:#8fceaa" }), `Đúng (${okN})`),
-      h("span", {}, h("i", { style: "background:var(--bad-soft);border-color:#ec9f9a" }), `Sai (${badN})`)),
-    h("p", { class: "muted", style: "font-size:13px;margin-top:10px" }, "Phím tắt: 1–5 hoặc A–E để chọn, ← → để chuyển câu."));
-  P.append(h("div", { class: "exam" }, card, side));
-}
-
-function courseSummary(P, l) {
-  const ord = cOrder[l.id], round = cRound[l.id] || 0;
-  const d = ord.filter(n => A(l)[n]).length, r = ord.filter(n => isRight(byId.get(n), A(l)[n])).length;
-  const wrongRound = ord.filter(n => A(l)[n] && !isRight(byId.get(n), A(l)[n]));
-  const wrongAll = l.ns.filter(n => !isRight(byId.get(n), A(l)[n]));
-  const known = l.ns.length - wrongAll.length, mastered = !wrongAll.length, left = ord.findIndex(n => !A(l)[n]);
-  const idx = C_LESSONS.indexOf(l), nx = C_LESSONS[idx + 1], first = CS.res[l.id];
-  const nextBtn = nx ? h("button", { class: "btn primary", onclick: () => cGo(nx.ch.id === l.ch.id ? { v: "q", l: nx.id, i: 0, fresh: true } : { v: "ch", c: nx.ch.id }) }, nx.ch.id === l.ch.id ? `Bài tiếp: ${nx.name}` : `Sang Chương ${nx.ch.id}`)
-    : h("button", { class: "btn primary", onclick: () => cGo({ v: "home" }) }, "Về khóa ôn");
-  const main = left >= 0 ? h("button", { class: "btn primary", onclick: () => cGo({ v: "q", l: l.id, i: left }) }, `Làm tiếp (còn ${ord.length - d} câu)`)
-    : !mastered ? h("button", { class: "btn primary", onclick: () => cLoop(l) }, `Ôn lại ${wrongAll.length} câu sai (vòng ${round + 1})`) : nextBtn;
-  const tag = left >= 0 ? ["", "CHƯA XONG"] : mastered ? ["good", "ĐÃ THUỘC HẾT"] : ["bad", `CÒN ${wrongAll.length} CÂU SAI`];
-  P.append(h("div", { class: "card score" },
-    h("div", {}, h("div", { class: "big " + (mastered ? "pass" : "fail") }, String(r)), h("div", { class: "muted", style: "font-size:15px" }, `/ ${ord.length} câu đúng`)),
-    h("div", {},
-      h("div", { class: "eyebrow2" }, `Kết quả ${round ? `vòng ôn câu sai ${round}` : "bài"} · Chương ${l.ch.id} · ${l.ch.title}`),
-      h("span", { class: "tag " + tag[0] }, tag[1]),
-      h("p", { class: "muted", style: "font-size:16px;margin-top:6px" }, `${l.name} · ${round ? `vòng ${round}: ` : ""}đã làm ${d}/${ord.length} · sai ${wrongRound.length} · đã thuộc ${known}/${l.ns.length} câu của bài`),
-      h("p", { class: "muted", style: "font-size:16px" }, (mastered ? "Bạn đã trả lời đúng mọi câu của bài, có thể sang bài tiếp." : "Ôn lại các câu sai đến khi đúng hết rồi sang bài tiếp.") + (first ? ` Lần làm đầu: đúng ${first.r}/${first.n}.` : "")),
-      h("div", { class: "cacts" }, main, mastered || left >= 0 ? null : nextBtn && h("button", { class: "btn", onclick: () => nextBtn.click() }, "Bỏ qua, sang bài tiếp"),
-        h("button", { class: "btn", onclick: () => cGo({ v: "q", l: l.id, i: 0, fresh: true }) }, "Làm lại cả bài"),
-        h("button", { class: "btn", onclick: () => cGo({ v: "ch", c: l.ch.id }) }, "Về chương")))));
-  const counts = { all: d, wrong: wrongRound.length, right: r };
-  P.append(h("h2", { class: "section-title", style: "margin-top:24px" }, "Xem lại và giải thích"));
-  P.append(h("div", { class: "filters" }, [["all", "Tất cả"], ["wrong", "Sai"], ["right", "Đúng"]].map(([k, t]) =>
-    h("button", { class: "btn small", "aria-pressed": cFilter === k, onclick: () => { cFilter = k; renderStudy(); } }, `${t} (${counts[k]})`))));
-  const show = ord.map((n, k) => [n, k]).filter(([n]) => {
-    const s2 = A(l)[n]; if (!s2) return false;
-    const ok = isRight(byId.get(n), s2);
-    return cFilter === "all" || (cFilter === "wrong" && !ok) || (cFilter === "right" && ok);
-  });
-  if (!show.length) P.append(h("p", { class: "empty" }, "Không có câu nào khớp bộ lọc này."));
-  for (const [n, k] of show) {
-    const q = byId.get(n), s2 = A(l)[n], ok = isRight(q, s2);
-    P.append(h("div", { class: "qcard", style: "margin:14px 0" },
-      h("div", { class: "qhead" }, h("span", { class: "no" }, `Câu ${k + 1} · câu gốc #${q.id}`), h("span", { class: "tag " + (ok ? "good" : "bad") }, ok ? "Đúng" : "Sai"), q.k > 1 ? h("span", { class: "tag warn" }, `Chọn ${q.k}`) : null),
-      h("p", { class: "stem" }, stemNodes(q)),
-      optionList(q, s2, true, () => {}, []),
-      explainBlock(q, s2)));
-  }
-}
-
-document.addEventListener("keydown", e => {
-  if (S.tab !== "study" || sv.v !== "q" || !C_LB[sv.l]) return;
-  if (e.target.closest("input,select,textarea") || e.ctrlKey || e.metaKey || e.altKey) return;
-  const l = C_LB[sv.l], ord = cOrder[l.id];
-  if (e.key === "ArrowRight") { e.preventDefault(); cGo(sv.i < ord.length - 1 ? { v: "q", l: l.id, i: sv.i + 1 } : { v: "sum", l: l.id }); return; }
-  if (e.key === "ArrowLeft" && sv.i > 0) { e.preventDefault(); cGo({ v: "q", l: l.id, i: sv.i - 1 }); return; }
-  const k = e.key.toUpperCase();
-  let pos = "12345".indexOf(k); if (pos < 0 && k.length === 1) pos = LET.indexOf(k);
-  const btns = document.querySelectorAll("#panel-study .exam .choice");
-  if (pos >= 0 && btns[pos] && !btns[pos].disabled) { e.preventDefault(); btns[pos].click(); }
-});
-
 /* ---------- boot ---------- */
 if (S.exam && !S.exam.done && Date.now() >= S.exam.deadline) submitExam(true);
 if (S.exam && S.exam.done) view = "home";
 updatePills();
-setTab(S.tab === "study" ? "study" : "exam");
+setTab("exam");
 </script>
 </body>
 </html>
