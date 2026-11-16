@@ -166,8 +166,18 @@ table.kv tr + tr th { border-top: 1px solid var(--line); }
 }
 @media print { .tabs, .bar, .tools, .filters { display: none !important; } }
 </style>
+<style>
+.examtabs { background: #0c1628; border-bottom: 1px solid #2a3a58; font-family: "Lexend", "Segoe UI", Roboto, Arial, sans-serif; }
+.examtabs .in { max-width: 1160px; margin: 0 auto; padding: 8px max(16px, env(safe-area-inset-left, 0px)); display: flex; gap: 6px; align-items: center; overflow-x: auto; }
+.examtabs .lb { color: #8d9bb3; font: 500 13px "Source Sans 3", "Segoe UI", Arial, sans-serif; margin-right: 6px; white-space: nowrap; }
+.examtabs a { color: #c8d2e2; text-decoration: none; font-weight: 600; font-size: 15px; padding: 6px 16px; border-radius: 8px; white-space: nowrap; }
+.examtabs a:hover { background: #24375a; color: #fff; }
+.examtabs a[aria-current="page"] { background: #fff; color: #14233d; }
+@media print { .examtabs { display: none; } }
+</style>
 </head>
 <body>
+<nav class="examtabs" aria-label="Chọn kỳ thi"><div class="in"><span class="lb">Kỳ thi:</span><a href="ccar-f-mock-exam.html">CCAR-F</a><a href="ccdv-f-mock-exam.html" aria-current="page">CCDV-F</a></div></nav>
 <header class="hero" id="hero">
   <div class="wrap">
     <div class="kicker">Luyện thi chứng chỉ · Đề luyện tập không chính thức</div>
