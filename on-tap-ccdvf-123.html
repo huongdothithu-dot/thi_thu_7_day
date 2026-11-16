@@ -768,7 +768,7 @@ function courseQuestion(l, i) {
   const ord = cOrder[l.id], n = ord[i], q = CQ_BY[n], mine = A(l)[n], done = mine != null;
   const showKw = CS.hl;
   const d = cDone(ord, l);
-  const opts = done ? cReview(q, mine) : `<div class="opts">${cPerm[n].map((orig, shown) => `<label class="opt" for="co${orig}"><input type="${Array.isArray(q.a) ? "checkbox" : "radio"}" name="cans" id="co${orig}" data-copt="${orig}" ${(cPend[n] || []).includes(orig) ? "checked" : ""}><span class="ltr">${LETTERS[shown]}</span><span>${cOpt(q.o[orig], orig === q.a, false, q, orig)}</span></label>`).join("")}</div>`;
+  const opts = done ? cReview(q, mine) : `<div class="opts">${cPerm[n].map((orig, shown) => `<label class="opt${Array.isArray(q.a) ? " multi" : ""}${(cPend[n] || []).includes(orig) ? " sel" : ""}" for="co${orig}"><input type="${Array.isArray(q.a) ? "checkbox" : "radio"}" name="cans" id="co${orig}" data-copt="${orig}" ${(cPend[n] || []).includes(orig) ? "checked" : ""}><span class="ltr">${LETTERS[shown]}</span><span>${cOpt(q.o[orig], orig === q.a, false, q, orig)}</span></label>`).join("")}</div>`;
   const cells = ord.map((m, j) => { const a = A(l)[m]; return `<button class="cell ${a == null ? "" : cOk(CQ_BY[m], a) ? "cok" : "cno"} ${j === i ? "cur" : ""}" ${cAttr({ v: "q", l: l.id, i: j })} aria-label="Câu ${j + 1}">${j + 1}</button>`; }).join("");
   const last = i === ord.length - 1;
   return `<div class="bar"><div class="wrap">
@@ -842,7 +842,7 @@ function cAnswer(orig) {
   if (Array.isArray(q.a)) {
     const p = cPend[n] = cPend[n] || [], j = p.indexOf(orig);
     if (j >= 0) p.splice(j, 1); else p.push(orig);
-    if (p.length < q.a.length) { render(); return; }
+    if (p.length < q.a.length) { render("co" + orig); return; }
     A(l)[n] = p.slice().sort((x, y) => x - y); delete cPend[n];
   } else A(l)[n] = orig;
   if (!cRound[l.id] && cDone(l.ns, l) === l.ns.length) { CS.res = CS.res || {}; CS.res[l.id] = { r: cRight(l.ns, l), n: l.ns.length, at: Date.now() }; }
