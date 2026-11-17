@@ -143,6 +143,10 @@ span.cuelab { display: inline-block; margin-left: .35em; font: 700 12px/1.4 var(
 .meter { height: 10px; background: var(--sunken); border-radius: 99px; overflow: hidden; margin-top: 10px; position: relative; }
 .meter span { position: absolute; inset: 0 auto 0 0; background: var(--accent); border-radius: 99px; }
 .meter i { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--ink); }
+.sync textarea { display: block; width: 100%; min-height: 76px; margin-top: 12px; border: 1px solid var(--line2); border-radius: 8px; padding: 9px 11px; font: 13px/1.45 ui-monospace, Menlo, Consolas, monospace; overflow-wrap: anywhere; resize: vertical; background: var(--sheet); color: inherit; }
+.sync-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.syncmsg { margin-top: 10px; font-size: 14px; min-height: 1em; }
+.syncmsg.ok { color: var(--good); } .syncmsg.err { color: var(--bad); }
 .doms { display: grid; gap: 6px; }
 .dom { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(80px, 1fr) auto auto; gap: 12px; align-items: center; text-align: left; width: 100%; border: 1px solid var(--line); background: var(--sheet); border-radius: 10px; padding: 9px 12px; color: inherit; font-size: 15px; cursor: pointer; }
 .dom:hover { border-color: var(--line2); }
@@ -363,6 +367,8 @@ function renderHome() {
   const hist = [];
   for (const key of Object.keys(SETS)) for (const r of (S.results[key] || [])) hist.push({ key, ...r });
   hist.sort((a, b) => b.at - a.at);
+  P.append(syncCard());
+  if (SY.scroll) { SY.scroll = false; setTimeout(() => document.getElementById("sync-card")?.scrollIntoView({ block: "center" }), 50); }
   P.append(h("div", { class: "info-grid" },
     h("div", { class: "card" },
       h("h3", { style: "font-size:18px;margin-bottom:8px" }, "Cấu trúc bài thi thử"),
@@ -739,6 +745,129 @@ function cueHtml(src) {
   return { cue, html: escH(src.slice(0, cue.cueStart)) + `<mark class="cuehl" title="${escH(cue.tip)}">${escH(src.slice(cue.cueStart, cue.cueEnd))}</mark><span class="cuelab">Học: ${escH(cue.kind)}</span>` + escH(src.slice(cue.cueEnd)) };
 }
 
+
+/* ===== Chuyển tiến độ sang máy khác: cả CCAR-F và CCDV-F, cùng định dạng link/mã/file với trang CCAR-F ===== */
+const SYNC_PREFIXES = ["ccarf-", "ccdvf-"], CCAR_SET_RE = /^ccarf-mock-v1(-s\d+)?$/;
+const pj = s => { try { return JSON.parse(s); } catch (e) { return null; } };
+function syncSnapshot() {
+  const data = {};
+  try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && SYNC_PREFIXES.some(p => k.startsWith(p))) data[k] = localStorage.getItem(k); } } catch (e) {}
+  return { app: "ccar-f-mock", v: 1, at: Date.now(), data };
+}
+function b64u(bytes) { let s = ""; for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000)); return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); }
+function unb64u(str) { const s = atob(str.replace(/-/g, "+").replace(/_/g, "/") + "===".slice((str.length + 3) % 4)); const b = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) b[i] = s.charCodeAt(i); return b; }
+async function streamThrough(bytes, ts) { return new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(ts)).arrayBuffer()); }
+async function packCode() {
+  const bytes = new TextEncoder().encode(JSON.stringify(syncSnapshot()));
+  if (window.CompressionStream) { try { return "z" + b64u(await streamThrough(bytes, new CompressionStream("deflate-raw"))); } catch (e) {} }
+  return "j" + b64u(bytes);
+}
+async function unpackCode(raw) {
+  let s = String(raw || "").trim();
+  if (s.startsWith("{")) return JSON.parse(s);
+  const at = s.indexOf("#sync="); if (at >= 0) s = s.slice(at + 6);
+  s = s.replace(/\s+/g, "");
+  if (!s) throw new Error("empty");
+  const kind = s[0], bytes = unb64u(s.slice(1));
+  if (kind === "z") return JSON.parse(new TextDecoder().decode(await streamThrough(bytes, new DecompressionStream("deflate-raw"))));
+  if (kind === "j") return JSON.parse(new TextDecoder().decode(bytes));
+  throw new Error("format");
+}
+function attemptRank(s) { return [s.startedAt || 0, s.phase === "result" ? 2 : s.phase === "exam" ? 1 : 0, s.endedAt || 0, Object.values(s.answers || {}).filter(x => x && x.length).length]; }
+function newerAttempt(a, b) {
+  if (!b || !b.phase) return false; if (!a || !a.phase) return true;
+  const ra = attemptRank(a), rb = attemptRank(b);
+  for (let i = 0; i < ra.length; i++) if (ra[i] !== rb[i]) return rb[i] > ra[i];
+  return false;
+}
+function mergeCourse(cur, inc) {
+  const a = pj(cur) || { ans: {}, hl: true, last: null }, b = pj(inc);
+  if (!b || typeof b.ans !== "object") return cur;
+  if (a.v !== 2 || b.v !== 2) return b.v === 2 ? inc : cur;
+  for (const [k, m] of Object.entries(b.ans)) { a.ans[k] = a.ans[k] || {}; for (const [n, v] of Object.entries(m || {})) if (a.ans[k][n] == null && v != null) a.ans[k][n] = v; }
+  if (!a.last && b.last) a.last = b.last;
+  a.res = a.res || {};
+  for (const [k, v] of Object.entries(b.res || {})) if (v && (!a.res[k] || (v.at || 0) > (a.res[k].at || 0))) a.res[k] = v;
+  return JSON.stringify(a);
+}
+function mergeDvMock(cur, inc) { /* CCDV-F thi thử: gộp lịch sử theo thời điểm nộp, bài làm dở mới hơn được giữ */
+  const pj = s => { try { return JSON.parse(s); } catch (e) { return null; } };
+  const a = pj(cur), b = pj(inc);
+  if (!b || typeof b !== "object") return [cur, 0, 0];
+  if (!a || typeof a !== "object") return [inc, Object.values(b.results || {}).reduce((n, l) => n + (l || []).length, 0), b.exam ? 1 : 0];
+  let added = 0, ex = 0;
+  a.results = a.results || {};
+  for (const [k, list] of Object.entries(b.results || {})) {
+    const have = a.results[k] || [], seen = new Set(have.map(r => r && r.at));
+    const add = (list || []).filter(r => r && r.at && !seen.has(r.at)); added += add.length;
+    a.results[k] = [...have, ...add].sort((x, y) => y.at - x.at).slice(0, 20);
+  }
+  if (b.exam && (!a.exam || (b.exam.start || 0) > (a.exam.start || 0))) { a.exam = b.exam; ex = 1; }
+  a.study = Object.assign({}, b.study || {}, a.study || {});
+  return [JSON.stringify(a), added, ex];
+}
+function mergeSnapshot(snap) {
+  if (!snap || typeof snap.data !== "object" || !snap.data) throw new Error("format");
+  let sets = 0, added = 0;
+  for (const [k, v] of Object.entries(snap.data)) {
+    if (!SYNC_PREFIXES.some(p => k.startsWith(p)) || typeof v !== "string") continue;
+    const cur = localStorage.getItem(k);
+    if (CCAR_SET_RE.test(k)) { if (newerAttempt(pj(cur), pj(v))) { localStorage.setItem(k, v); sets++; } }
+    else if (k === "ccarf-course" || k === "ccdvf-course") localStorage.setItem(k, mergeCourse(cur, v));
+    else if (k === KEY) { const [m, ad, ex] = mergeDvMock(cur, v); localStorage.setItem(k, m); added += ad; sets += ex; }
+    else if (k === "ccarf-history") {
+      const all = [...(pj(cur) || []), ...(pj(v) || [])].filter(x => x && x.at), seen = new Set();
+      const merged = all.sort((x, y) => x.at - y.at).filter(x => { const id = `${x.set}|${x.at}`; if (seen.has(id)) return false; seen.add(id); return true; }).slice(-40);
+      added += merged.length - (pj(cur) || []).length; localStorage.setItem(k, JSON.stringify(merged));
+    } else if (k === "ccarf-current-set" || cur === null) localStorage.setItem(k, v);
+  }
+  return { sets, added: Math.max(0, added) };
+}
+const SY = { cls: "", text: "", out: "", paste: false };
+try { const m = pj(sessionStorage.getItem("ccdvf-sync-msg")); if (m) { SY.cls = m[0]; SY.text = m[1]; SY.scroll = true; sessionStorage.removeItem("ccdvf-sync-msg"); } } catch (e) {}
+async function importCode(raw) {
+  try {
+    const r = mergeSnapshot(await unpackCode(raw));
+    const text = r.sets || r.added ? `Đã nhập tiến độ: cập nhật ${r.sets} đề, thêm ${r.added} lượt vào lịch sử điểm (cả CCAR-F và CCDV-F).` : "Đã nhập. Máy này đã có tiến độ mới bằng hoặc hơn nên không có gì thay đổi.";
+    try { sessionStorage.setItem("ccdvf-sync-msg", JSON.stringify(["ok", text])); } catch (e) {}
+    location.reload();
+  } catch (e) { SY.cls = "err"; SY.text = "Không đọc được link, mã hoặc file tiến độ. Hãy kiểm tra đã sao chép đủ chưa rồi thử lại."; drawSync(); }
+}
+async function makeLink() {
+  try {
+    SY.out = `${location.origin}${location.pathname}#sync=${await packCode()}`;
+    let copied = false; try { await navigator.clipboard.writeText(SY.out); copied = true; } catch (e) {}
+    SY.cls = "ok"; SY.text = copied ? "Đã sao chép link. Gửi link cho chính bạn (Zalo, email…) rồi mở trên máy kia là tiến độ được nạp vào." : "Hãy sao chép link bên dưới, gửi cho chính bạn rồi mở trên máy kia.";
+  } catch (e) { SY.cls = "err"; SY.text = "Không tạo được link trên trình duyệt này. Hãy dùng Tải file tiến độ."; }
+  drawSync(); const el = document.getElementById("syncout"); if (el) { el.focus(); el.select(); }
+}
+function saveProgressFile() {
+  const filename = `tien-do-ccar-ccdv-${new Date().toLocaleDateString("sv")}.json`, data = JSON.stringify(syncSnapshot());
+  try {
+    const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([data], { type: "application/json" })); a.download = filename; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    SY.cls = "ok"; SY.text = `Đã tải ${filename}. Trên máy kia, bấm Nhập file tiến độ và chọn file này.`;
+  } catch (e) { SY.cls = "err"; SY.text = "Không tải được file tiến độ. Hãy dùng Tạo link chuyển tiến độ."; }
+  drawSync();
+}
+function syncCard() {
+  const file = h("input", { type: "file", accept: ".json,.txt,application/json,text/plain", hidden: true });
+  file.onchange = () => { const f = file.files && file.files[0]; if (f) f.text().then(importCode); };
+  const pin = SY.paste ? h("textarea", { id: "syncin", placeholder: "Dán link hoặc mã tiến độ vào đây", "aria-label": "Link hoặc mã tiến độ" }) : null;
+  return h("section", { class: "card sync", id: "sync-card", style: "margin-top:22px" },
+    h("h3", { style: "font-size:20px;margin-bottom:6px" }, "Chuyển tiến độ sang máy khác"),
+    h("p", { class: "muted", style: "font-size:15px;max-width:68ch" }, "Tiến độ của cả CCAR-F và CCDV-F (bài đang làm, kết quả các đề, lịch sử điểm, khóa ôn) chỉ lưu trong trình duyệt này, nên máy khác mở trang sẽ không thấy. Tạo link chuyển rồi mở link đó trên máy kia, hoặc tải file tiến độ rồi nhập trên máy kia. Khi nhập, bài mới hơn được giữ lại và lịch sử điểm được gộp, nên không mất dữ liệu ở máy nhận. Link và file này dùng được ở cả trang CCAR-F lẫn CCDV-F."),
+    h("div", { class: "sync-actions" },
+      h("button", { class: "btn", onclick: makeLink }, "Tạo link chuyển tiến độ"),
+      h("button", { class: "btn", onclick: saveProgressFile }, "Tải file tiến độ"),
+      h("button", { class: "btn", onclick: () => file.click() }, "Nhập file tiến độ"),
+      h("button", { class: "btn ghost", onclick: () => { SY.paste = !SY.paste; drawSync(); } }, "Dán link hoặc mã")),
+    file,
+    SY.out ? h("textarea", { id: "syncout", readonly: true, "aria-label": "Link chuyển tiến độ" }, SY.out) : null,
+    pin, SY.paste ? h("div", { class: "sync-actions" }, h("button", { class: "btn primary", onclick: () => importCode(pin.value) }, "Nhập tiến độ"), h("button", { class: "btn ghost", onclick: () => { SY.paste = false; drawSync(); } }, "Hủy")) : null,
+    h("p", { class: "syncmsg " + SY.cls, role: "status" }, SY.text));
+}
+function drawSync() { const old = document.getElementById("sync-card"); if (old) old.replaceWith(syncCard()); }
+
 /* ================= STUDY TAB ================= */
 const F = { q: "", set: "all", st: "all" };
 let studyBuilt = false;
@@ -856,6 +985,11 @@ if (S.exam && !S.exam.done && Date.now() >= S.exam.deadline) submitExam(true);
 if (S.exam && S.exam.done) view = "home";
 updatePills();
 setTab("exam");
+if (location.hash.startsWith("#sync=")) {
+  const code = location.hash.slice(6);
+  try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {}
+  importCode(code);
+}
 </script>
 </body>
 </html>

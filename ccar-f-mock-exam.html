@@ -4780,10 +4780,10 @@ function resultView() {
 
 /* Progress lives only in this browser's localStorage, so another device starts empty. These helpers move it between devices: a link (data in the #hash, never sent to the server), a pasted code, or a .json file. Importing merges: per set the newer attempt wins, score history is united. */
 let syncMsg = { cls: "", text: "" }, syncOut = "", pasteOpen = false;
-const SYNC_PREFIX = "ccarf-", SET_KEY_RE = /^ccarf-mock-v1(-s\d+)?$/;
+const SYNC_PREFIXES = ["ccarf-", "ccdvf-"], SYNC_PREFIX = "ccarf-", SET_KEY_RE = /^ccarf-mock-v1(-s\d+)?$/;
 function syncSnapshot() {
   const data = {};
-  try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && k.startsWith(SYNC_PREFIX)) data[k] = localStorage.getItem(k); } } catch (e) {}
+  try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && SYNC_PREFIXES.some(p => k.startsWith(p))) data[k] = localStorage.getItem(k); } } catch (e) {}
   return { app: "ccar-f-mock", v: 1, at: Date.now(), data };
 }
 function b64u(bytes) { let s = ""; for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000)); return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); }
@@ -4813,11 +4813,27 @@ function newerAttempt(a, b) { /* true when b should replace a */
   for (let i = 0; i < ra.length; i++) if (ra[i] !== rb[i]) return rb[i] > ra[i];
   return false;
 }
+function mergeDvMock(cur, inc) { /* CCDV-F thi thử: gộp lịch sử theo thời điểm nộp, bài làm dở mới hơn được giữ */
+  const pj = s => { try { return JSON.parse(s); } catch (e) { return null; } };
+  const a = pj(cur), b = pj(inc);
+  if (!b || typeof b !== "object") return [cur, 0, 0];
+  if (!a || typeof a !== "object") return [inc, Object.values(b.results || {}).reduce((n, l) => n + (l || []).length, 0), b.exam ? 1 : 0];
+  let added = 0, ex = 0;
+  a.results = a.results || {};
+  for (const [k, list] of Object.entries(b.results || {})) {
+    const have = a.results[k] || [], seen = new Set(have.map(r => r && r.at));
+    const add = (list || []).filter(r => r && r.at && !seen.has(r.at)); added += add.length;
+    a.results[k] = [...have, ...add].sort((x, y) => y.at - x.at).slice(0, 20);
+  }
+  if (b.exam && (!a.exam || (b.exam.start || 0) > (a.exam.start || 0))) { a.exam = b.exam; ex = 1; }
+  a.study = Object.assign({}, b.study || {}, a.study || {});
+  return [JSON.stringify(a), added, ex];
+}
 function mergeSnapshot(snap) {
   if (!snap || typeof snap.data !== "object" || !snap.data) throw new Error("format");
   const inc = snap.data; let sets = 0, added = 0;
   for (const [k, v] of Object.entries(inc)) {
-    if (!k.startsWith(SYNC_PREFIX) || typeof v !== "string") continue;
+    if (!SYNC_PREFIXES.some(p => k.startsWith(p)) || typeof v !== "string") continue;
     const cur = localStorage.getItem(k);
     if (SET_KEY_RE.test(k)) {
       if (newerAttempt(parseJson(cur), parseJson(v))) { localStorage.setItem(k, v); sets++; }
@@ -4826,8 +4842,12 @@ function mergeSnapshot(snap) {
     } else if (k === "ccarf-history") {
       const all = [...(parseJson(cur) || []), ...(parseJson(v) || [])].filter(h => h && h.at);
       const seen = new Set(), merged = all.sort((x, y) => x.at - y.at).filter(h => { const id = `${h.set}|${h.at}`; if (seen.has(id)) return false; seen.add(id); return true; }).slice(-40);
-      added = merged.length - (parseJson(cur) || []).length;
+      added += merged.length - (parseJson(cur) || []).length;
       localStorage.setItem(k, JSON.stringify(merged));
+    } else if (k === "ccdvf-course") {
+      localStorage.setItem(k, mergeCourse(cur, v));
+    } else if (k === "ccdvf-mock.v1") {
+      const [m, ad, ex] = mergeDvMock(cur, v); localStorage.setItem(k, m); added += ad; sets += ex;
     } else if (k === "ccarf-current-set" || cur === null) {
       localStorage.setItem(k, v);
     }
@@ -4866,7 +4886,7 @@ async function makeLink() {
   render(); const el = document.getElementById("syncout"); if (el) { el.focus(); el.select(); }
 }
 async function saveProgressFile() {
-  const filename = `ccar-f-tien-do-${new Date().toLocaleDateString("sv")}.json`, data = JSON.stringify(syncSnapshot());
+  const filename = `tien-do-ccar-ccdv-${new Date().toLocaleDateString("sv")}.json`, data = JSON.stringify(syncSnapshot());
   try {
     if (dl) await dl.save({ filename, data });
     else { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([data], { type: "application/json" })); a.download = filename; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000); }
@@ -4876,7 +4896,7 @@ async function saveProgressFile() {
 }
 function syncView() {
   return `<section class="card sync"><h2>Chuyển tiến độ sang máy khác</h2>
-    <p class="sub">Tiến độ (bài đang làm, kết quả các đề, lịch sử điểm) chỉ lưu trong trình duyệt này, nên máy khác mở trang sẽ không thấy. Tạo link chuyển rồi mở link đó trên máy kia, hoặc tải file tiến độ rồi nhập trên máy kia. Khi nhập, với mỗi đề bài mới hơn được giữ lại và lịch sử điểm được gộp, nên không mất dữ liệu ở máy nhận.</p>
+    <p class="sub">Tiến độ của cả CCAR-F và CCDV-F (bài đang làm, kết quả các đề, lịch sử điểm, khóa ôn) chỉ lưu trong trình duyệt này, nên máy khác mở trang sẽ không thấy. Tạo link chuyển rồi mở link đó trên máy kia, hoặc tải file tiến độ rồi nhập trên máy kia. Khi nhập, với mỗi đề bài mới hơn được giữ lại và lịch sử điểm được gộp, nên không mất dữ liệu ở máy nhận.</p>
     <div class="actions"><button class="btn" id="synclink">Tạo link chuyển tiến độ</button><button class="btn" id="syncsave">Tải file tiến độ</button><button class="btn" id="syncopen">Nhập file tiến độ</button><button class="btn ghost" id="syncpaste">Dán link hoặc mã</button></div>
     <input type="file" id="syncfile" accept=".json,.txt,application/json,text/plain" hidden>
     ${syncOut ? `<textarea id="syncout" readonly aria-label="Link chuyển tiến độ">${esc(syncOut)}</textarea>` : ""}
