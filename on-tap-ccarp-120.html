@@ -299,6 +299,8 @@ mark.kw { background: #ffe566; color: inherit; padding: 0 .12em; border-radius: 
 .sig.pick { background: var(--good-soft); border-color: var(--good); color: var(--good); }
 .sig.both { background: var(--warn-soft); color: var(--warn); }
 .sigcard { padding-block: 16px; }
+.edgelbl { font-weight: 700; margin: 10px 0 6px; }
+.sigcard .edgemem { margin: 12px 0 0; color: inherit; }
 .rulesmore summary { cursor: pointer; font: 600 18px var(--display); }
 .rulesmore .crules { margin-top: 10px; }
 .rulehead { font-size: 22px; margin: 12px 0 -6px; }
@@ -361,6 +363,19 @@ let cPend = {};
 function cSigTable(list, kind) {
   if (!list || !list.length) return `<p class="empty">Chương này không có cụm nào đủ chắc chắn.</p>`;
   return `<div class="sigs">${list.map(x => `<span class="sig ${kind}" title="${esc(x.why)} · Cả ${COURSE_Q.length} câu: đúng ${x.all[0]}, sai ${x.all[1]}">${kind === "drop" ? "✕" : kind === "pick" ? "✓" : "⚖"} ${esc(x.w)} <small>${x.all[0]}/${x.all[0] + x.all[1]}</small></span>`).join("")}</div>`;
+}
+/* Opening / closing words of an option, counted live over the course bank. */
+const C_EDGE = {
+  startPick: [["Define …", /^define\b/i], ["Identify …", /^identify\b/i]],
+  startDrop: [["Disable …", /^disable\b/i], ["Increase …", /^increase\b/i], ["Switch …", /^switch\b/i], ["Document …", /^document\b/i], ["Recommend …", /^recommend\b/i]],
+  endDrop: [["…, accepting that/the …", /,\s*accepting (that|the)\b[^,]*$/i], ["… every / each / per request", /\b(every|each|per)( incoming)? request[.;]?$/i], ["…, and no …", /,\s*and no\b[^,]*$/i]],
+};
+function cEdgeTable(list, kind) {
+  return `<div class="sigs">${list.map(([label, re]) => {
+    let ok = 0, all = 0;
+    COURSE_Q.forEach(q => q.o.forEach((o, i) => { if (re.test(o.trim())) { all++; if (cIsA(q, i)) ok++; } }));
+    return `<span class="sig ${kind}" title="Cả ${COURSE_Q.length} câu: đúng ${ok}, sai ${all - ok}">${kind === "drop" ? "✕" : "✓"} ${esc(label)} <small>${ok}/${all}</small></span>`;
+  }).join("")}</div>`;
 }
 /* Compare options from the END. Shared suffix is yellow; the few
    differing words just before it (or the last few words if there is
@@ -744,6 +759,11 @@ function courseChapter(id) {
     <main class="wrap start">
       <section><h2>Bài học</h2><div class="setgrid">${c.lessons.map(l => { const s = cLessonStatus(l); return `<button class="setcard" ${cAttr({ v: "q", l: l.id, i: 0, fresh: 1 })}><b>${esc(l.name)}</b><span class="setstat ${s.cls}">${s.text}</span><span class="setscen">${l.cat === "E" ? "Câu dễ — đề hoặc đáp ngắn, ít nhiễu" : "Câu khó — nhớ đầu hoặc đuôi đáp án đúng"}</span></button>`; }).join("")}</div></section>
       <h2 class="rulehead">Quy tắc cần nhớ</h2>
+      <section class="card sigcard edge"><h2>⚡ Nhìn 2–3 từ đầu / cuối phương án</h2><p class="sub">Đếm trên cả ${COURSE_Q.length} câu. Số nhỏ = số lần đúng / tổng số lần xuất hiện. Câu hỏi "BEFORE …" → chọn Define / Identify.</p>
+        <p class="edgelbl">Mở đầu → chọn</p>${cEdgeTable(C_EDGE.startPick, "pick")}
+        <p class="edgelbl">Mở đầu → loại</p>${cEdgeTable(C_EDGE.startDrop, "drop")}
+        <p class="edgelbl">Kết thúc → loại</p>${cEdgeTable(C_EDGE.endDrop, "drop")}
+        <p class="sub edgemem">Nhớ: <b>Định nghĩa – Xác định thì CHỌN; Tắt – Tăng – Đổi – Ghi chép thì LOẠI.</b></p></section>
       <section class="card sigcard drop"><h2>🚫 Thấy là loại</h2><p class="sub">Chưa từng là đáp án đúng trong ${COURSE_Q.length} câu — gặp là gạch luôn. Số nhỏ = số lần đúng / tổng số lần xuất hiện.</p>${cSigTable((C_SIG[c.id] || {}).drop, "drop")}</section>
       <section class="card sigcard pick"><h2>✅ Thấy là chọn</h2><p class="sub">Chưa từng nằm ở phương án sai trong ${COURSE_Q.length} câu.</p>${cSigTable((C_SIG[c.id] || {}).pick, "pick")}</section>
       <section class="card sigcard both"><h2>⚖️ Hai mặt</h2><p class="sub">Đã từng là đáp án đúng và cũng từng là bẫy (dù chỉ 1 lần) — phải đọc tình huống, xem ở câu khó.</p>${cSigTable((C_SIG[c.id] || {}).both, "both")}</section>
