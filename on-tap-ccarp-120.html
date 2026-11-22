@@ -764,8 +764,6 @@ function courseChapter(id) {
         <p class="edgelbl">Mở đầu → loại</p>${cEdgeTable(C_EDGE.startDrop, "drop")}
         <p class="edgelbl">Kết thúc → loại</p>${cEdgeTable(C_EDGE.endDrop, "drop")}
         <p class="sub edgemem">Nhớ: <b>Định nghĩa – Xác định thì CHỌN; Tắt – Tăng – Đổi – Ghi chép thì LOẠI.</b></p></section>
-      <section class="card sigcard drop"><h2>🚫 Thấy là loại</h2><p class="sub">Chưa từng là đáp án đúng trong ${COURSE_Q.length} câu — gặp là gạch luôn. Số nhỏ = số lần đúng / tổng số lần xuất hiện.</p>${cSigTable((C_SIG[c.id] || {}).drop, "drop")}</section>
-      <section class="card sigcard pick"><h2>✅ Thấy là chọn</h2><p class="sub">Chưa từng nằm ở phương án sai trong ${COURSE_Q.length} câu.</p>${cSigTable((C_SIG[c.id] || {}).pick, "pick")}</section>
       <section class="card sigcard both"><h2>⚖️ Hai mặt</h2><p class="sub">Đã từng là đáp án đúng và cũng từng là bẫy (dù chỉ 1 lần) — phải đọc tình huống, xem ở câu khó.</p>${cSigTable((C_SIG[c.id] || {}).both, "both")}</section>
       <details class="card rulesmore"><summary>Từ khóa trong đề → đáp án (bấm để mở)</summary><ol class="crules">${c.rules.map(r => `<li>${r}</li>`).join("")}</ol></details>
       <div class="actions">${prev ? `<button class="btn" ${cAttr({ v: "ch", c: prev.id })}>← Chương ${prev.id}</button>` : ""}${next ? `<button class="btn" ${cAttr({ v: "ch", c: next.id })}>Chương ${next.id} →</button>` : ""}</div>
