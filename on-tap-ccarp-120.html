@@ -715,6 +715,33 @@ COURSE_CH.forEach(c => {
   cAddParts(c, "E", "Câu dễ", COURSE_Q.filter(q => q.topic === c.id && cIsEasy(q)).map(q => q.n));
   cAddParts(c, "T", "Câu khó", COURSE_Q.filter(q => q.topic === c.id && !cIsEasy(q)).map(q => q.n));
 });
+/* Chương riêng theo DẠNG câu. Các câu này vẫn nằm trong chương chủ đề gốc;
+   ở đây gom lại để luyện riêng cách trả lời Yes/No và chọn nhóm bằng dropdown. */
+const C_KIND = {
+  Y: { mark: "Yes/No", card: "Chọn Yes hoặc No cho từng phát biểu", scen: "Câu Yes/No: mỗi dòng chấm riêng, phải đúng tất cả." },
+  D: { mark: "Phân loại", card: "Chọn nhóm cho từng mục bằng dropdown", scen: "Câu phân loại: mỗi mục chọn một nhóm, phải đúng tất cả." },
+};
+[
+  { id: COURSE_CH.length + 1, kind: "Y", title: "Dạng câu Yes/No", name: "Câu Yes/No", f: q => q.yn, rules: [
+    "Mỗi dòng được chấm <b>độc lập</b>: đọc từng phát biểu như một câu đúng/sai riêng, không đoán theo số dòng Yes.",
+    "Từ <b>tuyệt đối</b> (always, every task, identical, solely, can be ignored) hoặc cách làm <b>rủi ro</b> (giữ PII chưa che, công cụ thừa quyền, tính toán cố định giao cho prompt) → thường là <b>No</b>.",
+    "Phát biểu mô tả đúng <b>thông lệ / đánh đổi hợp lý</b> (least privilege, đánh giá trên mẫu đại diện, tiered routing, xác thực trước khi truy xuất) → thường là <b>Yes</b>.",
+    "Câu \"Claude có phù hợp không\": việc cần <b>suy luận trên ngôn ngữ</b> (soạn báo cáo, đọc hợp đồng dài, phân loại kèm lý do) → Yes; việc cần <b>độ trễ cực thấp</b> hoặc thay thế hạ tầng như vector index → No.",
+    "Phải đúng <b>tất cả</b> các dòng mới được tính điểm.",
+  ] },
+  { id: COURSE_CH.length + 2, kind: "D", title: "Dạng câu phân loại (dropdown)", name: "Câu phân loại", f: q => q.cls, rules: [
+    "Đọc tên các nhóm trong đề trước. Các câu hiện có đều là <b>6 mục, 3 nhóm, mỗi nhóm 2 mục</b>.",
+    "Pipeline: việc làm <b>trước khi gọi model</b> (OCR, ẩn PII) → <b>Pre-Processing</b>; việc <b>Claude làm</b> (phân loại, trích xuất) → <b>Model Stage</b>; <b>kiểm schema, lưu kết quả</b> → <b>Post-Processing</b>.",
+    "Token: <b>cắt / tóm tắt dữ liệu đưa vào</b> → <b>Input Preparation</b>; <b>sắp thứ tự prompt, prefix cache</b> → <b>Prompt Construction</b>; <b>kiểm và lưu output</b> → <b>Output Handling</b>.",
+    "Chunking: theo <b>mục / đoạn văn, cấu trúc tài liệu</b> → <b>Long Structured Documents</b>; <b>mỗi bản ghi một chunk</b>, fixed-size cho bản ghi ngắn → <b>Heterogeneous Short Records</b>; theo <b>hàm / cây phân cấp</b> → <b>Code or Hierarchical Specifications</b>.",
+    "Phải xếp đúng <b>tất cả</b> các mục mới được tính điểm.",
+  ] },
+].forEach(x => {
+  const c = { id: x.id, title: x.title, rules: x.rules, kind: x.kind, lessons: [] };
+  COURSE_CH.push(c);
+  cAddParts(c, x.kind, x.name, COURSE_Q.filter(x.f).map(q => q.n));
+});
+const cMarkOf = l => C_KIND[l.cat] ? C_KIND[l.cat].mark : l.cat === "P" ? "Cặp bẫy" : l.cat === "E" ? "Dễ" : "Khó";
 function cMakeOrder(l) {
   if (l.cat !== "P") return shuffled(l.ns.length, Math.random).map(i => l.ns[i]);
   const pairs = []; for (let i = 0; i < l.ns.length; i += 2) pairs.push(l.ns.slice(i, i + 2));
@@ -811,7 +838,7 @@ function courseHome() {
   return `<div class="hero"><div class="wrap">
       <div class="eyebrow">CCAR-P practice · Khóa ôn</div>
       <h1>Khóa ôn ${COURSE_Q.length} câu</h1>
-      <p class="lead">${COURSE_Q.length} câu luyện tập chia thành ${COURSE_CH.length} chương theo chủ đề. Mỗi chương có <b>quy tắc cần nhớ</b>, bài <b>câu dễ</b> (không có phương án gây nhiễu, hoặc đề/đáp án ngắn dễ nhớ) và bài <b>câu khó</b>. Thứ tự câu và đáp án được đảo mỗi lần mở.</p>
+      <p class="lead">${COURSE_Q.length} câu luyện tập chia thành ${COURSE_CH.filter(c => !c.kind).length} chương theo chủ đề, thêm ${COURSE_CH.filter(c => c.kind).length} chương luyện riêng dạng câu Yes/No và câu phân loại (dropdown). Mỗi chương có <b>quy tắc cần nhớ</b>, bài <b>câu dễ</b> (không có phương án gây nhiễu, hoặc đề/đáp án ngắn dễ nhớ) và bài <b>câu khó</b>. Thứ tự câu và đáp án được đảo mỗi lần mở.</p>
       <ul class="herofacts"><li><b>${COURSE_Q.length}</b>câu</li><li><b>${COURSE_CH.length}</b>chương</li><li><b>${COURSE_Q.filter(cIsEasy).length}</b>câu dễ</li><li><b>${COURSE_Q.filter(q => !cIsEasy(q)).length}</b>câu khó</li><li><b>${cSum(C_LESSONS).k}/${C_LESSONS.length}</b>bài đã học</li></ul>
       <div class="actions">
         ${last ? `<button class="btn primary" ${cAttr({ v: "q", l: last.id, i: Math.min(CS.last.i, cOrder[last.id].length - 1) })}>Học tiếp: Chương ${last.ch.id} · ${esc(last.name)}</button>` : `<button class="btn primary" ${cAttr({ v: "ch", c: 1 })}>Bắt đầu Chương 1</button>`}
@@ -839,10 +866,10 @@ function courseChapter(id) {
       </div>
     </div></div>
     <main class="wrap start">
-      <section><h2>Bài học</h2><div class="setgrid">${c.lessons.map(l => { const s = cLessonStatus(l); return `<button class="setcard" ${cAttr({ v: "q", l: l.id, i: 0, fresh: 1 })}><b>${esc(l.name)}</b><span class="setstat ${s.cls}">${s.text}</span><span class="setscen">${l.cat === "E" ? "Câu dễ — đề hoặc đáp ngắn, ít nhiễu" : "Câu khó — nhớ đầu hoặc đuôi đáp án đúng"}</span></button>`; }).join("")}</div></section>
+      <section><h2>Bài học</h2><div class="setgrid">${c.lessons.map(l => { const s = cLessonStatus(l); return `<button class="setcard" ${cAttr({ v: "q", l: l.id, i: 0, fresh: 1 })}><b>${esc(l.name)}</b><span class="setstat ${s.cls}">${s.text}</span><span class="setscen">${C_KIND[l.cat] ? C_KIND[l.cat].card : l.cat === "E" ? "Câu dễ — đề hoặc đáp ngắn, ít nhiễu" : "Câu khó — nhớ đầu hoặc đuôi đáp án đúng"}</span></button>`; }).join("")}</div></section>
       <h2 class="rulehead">Quy tắc cần nhớ</h2>
-      <section class="card sigcard both"><h2>⚖️ Hai mặt</h2><p class="sub">Đã từng là đáp án đúng và cũng từng là bẫy (dù chỉ 1 lần) — phải đọc tình huống, xem ở câu khó.</p>${cSigTable((C_SIG[c.id] || {}).both, "both")}</section>
-      <details class="card rulesmore"><summary>Từ khóa trong đề → đáp án (bấm để mở)</summary><ol class="crules">${c.rules.map(r => `<li>${r}</li>`).join("")}</ol></details>
+      ${c.kind ? "" : `<section class="card sigcard both"><h2>⚖️ Hai mặt</h2><p class="sub">Đã từng là đáp án đúng và cũng từng là bẫy (dù chỉ 1 lần) — phải đọc tình huống, xem ở câu khó.</p>${cSigTable((C_SIG[c.id] || {}).both, "both")}</section>`}
+      <details class="card rulesmore"${c.kind ? " open" : ""}><summary>${c.kind ? "Mẹo làm dạng câu này" : "Từ khóa trong đề → đáp án (bấm để mở)"}</summary><ol class="crules">${c.rules.map(r => `<li>${r}</li>`).join("")}</ol></details>
       <div class="actions">${prev ? `<button class="btn" ${cAttr({ v: "ch", c: prev.id })}>← Chương ${prev.id}</button>` : ""}${next ? `<button class="btn" ${cAttr({ v: "ch", c: next.id })}>Chương ${next.id} →</button>` : ""}</div>
     </main>`;
 }
@@ -876,9 +903,9 @@ function courseQuestion(l, i) {
     </div><div class="pbar" role="progressbar" aria-label="Tiến độ bài" aria-valuemin="0" aria-valuemax="${ord.length}" aria-valuenow="${d}"><span style="width:${d / ord.length * 100}%"></span></div></div>
     <main class="wrap exam">
       <div>
-        <div class="scen"><b>${cRound[l.id] ? `Vòng ôn câu sai ${cRound[l.id]} · ` : ""}${esc(l.name)} · Chương ${l.ch.id}: ${esc(l.ch.title)}</b>${l.cat === "E" ? "Câu dễ: nhớ đầu hoặc đuôi ngắn của đáp án đúng." : "Câu khó: nhớ đầu hoặc đuôi ngắn của đáp án đúng."}</div>
+        <div class="scen"><b>${cRound[l.id] ? `Vòng ôn câu sai ${cRound[l.id]} · ` : ""}${esc(l.name)} · Chương ${l.ch.id}: ${esc(l.ch.title)}</b>${C_KIND[l.cat] ? C_KIND[l.cat].scen : l.cat === "E" ? "Câu dễ: nhớ đầu hoặc đuôi ngắn của đáp án đúng." : "Câu khó: nhớ đầu hoặc đuôi ngắn của đáp án đúng."}</div>
         <section class="sheet">
-          <div class="qhead"><span class="eyebrow">Câu ${i + 1} · câu gốc #${q.n}</span><span class="mark ${l.cat === "E" ? "ok" : "blank"}">${l.cat === "P" ? "Cặp bẫy" : l.cat === "E" ? "Dễ" : "Khó"}</span></div>
+          <div class="qhead"><span class="eyebrow">Câu ${i + 1} · câu gốc #${q.n}</span><span class="mark ${l.cat === "E" ? "ok" : "blank"}">${cMarkOf(l)}</span></div>
           <p class="stem">${showKw ? cMark(q.q, q.sk) : fmt(q.q)}</p>
           ${done ? `<p class="instr"><span class="mark ${cOk(q, mine) ? "ok" : "no"}">${cOk(q, mine) ? "Đúng" : "Sai"}</span>${l.label ? ` <span class="clabel">Đáp án câu này: <b>${esc(l.label[n])}</b></span>` : ""}</p>` : `<p class="instr">${q.cls ? `Chọn nhóm cho từng mục. <span class="clabel">(đã chọn ${(cPend[n] || []).filter(x => x != null).length}/${q.o.length})</span>` : q.yn ? `Chọn Yes hoặc No cho từng phát biểu. <span class="clabel">(đã chọn ${(cPend[n] || []).length}/${q.o.length})</span>` : Array.isArray(q.a) ? `Select ${COUNT[q.a.length] || q.a.length}. <span class="clabel">(đã chọn ${(cPend[n] || []).length}/${q.a.length})</span>` : "Select ONE."}</p>`}
           ${opts}
@@ -902,7 +929,7 @@ function courseSummary(l) {
   const known = l.ns.length - wrongAll.length, first = (CS.res || {})[l.id];
   const idx = C_LESSONS.indexOf(l), nx = C_LESSONS[idx + 1];
   const shown = ord.filter(n => cFilter === "all" ? A(l)[n] != null : cFilter === "wrong" ? wrongRound.includes(n) : cOk(CQ_BY[n], A(l)[n]));
-  const cards = shown.map(n => { const q = CQ_BY[n], ok = cOk(q, A(l)[n]); return `<article class="rev"><div class="top"><span class="mark ${ok ? "ok" : "no"}">${ok ? "Đúng" : "Sai"}</span><b>Câu ${ord.indexOf(n) + 1}</b><span>Câu gốc #${n}</span><span>${l.label ? esc(l.label[n]) : l.cat === "E" ? "Dễ" : "Khó"}</span></div><p class="stem">${CS.hl ? cMark(q.q, q.sk) : fmt(q.q)}</p>${cReview(q, A(l)[n])}</article>`; }).join("");
+  const cards = shown.map(n => { const q = CQ_BY[n], ok = cOk(q, A(l)[n]); return `<article class="rev"><div class="top"><span class="mark ${ok ? "ok" : "no"}">${ok ? "Đúng" : "Sai"}</span><b>Câu ${ord.indexOf(n) + 1}</b><span>Câu gốc #${n}</span><span>${l.label ? esc(l.label[n]) : cMarkOf(l)}</span></div><p class="stem">${CS.hl ? cMark(q.q, q.sk) : fmt(q.q)}</p>${cReview(q, A(l)[n])}</article>`; }).join("");
   const nextBtn = nx ? (nx.ch !== l.ch ? `<button class="btn primary" ${cAttr({ v: "ch", c: nx.ch.id })}>Sang Chương ${nx.ch.id}</button>` : `<button class="btn primary" ${cAttr({ v: "q", l: nx.id, i: 0, fresh: 1 })}>Bài tiếp: ${esc(nx.name)}</button>`) : `<button class="btn primary" ${cAttr({ v: "home" })}>Hoàn thành khóa ôn</button>`;
   const main = left >= 0 ? `<button class="btn primary" ${cAttr({ v: "q", l: l.id, i: left })}>Làm tiếp (còn ${ord.length - d} câu)</button>`
     : !mastered ? `<button class="btn primary" id="cloop">Ôn lại ${wrongAll.length} câu sai (vòng ${round + 1})</button>`
