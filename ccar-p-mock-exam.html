@@ -410,7 +410,7 @@ function renderHome() {
     h("div", { class: "sets" },
       h("a", { class: "set", href: "on-tap-ccarp-120.html", style: "text-decoration:none" },
         h("h3", {}, "Khóa ôn 120 câu"), h("span", { class: "st " + cst.cls }, cst.text),
-        h("span", { class: "desc" }, "7 chương · câu dễ & câu khó · đảo câu và đáp án"))));
+        h("span", { class: "desc" }, "7 chương chủ đề + 2 chương dạng câu (Yes/No, dropdown) · đảo câu và đáp án"))));
   // info + history
   const hist = [];
   for (const key of Object.keys(SETS)) for (const r of (S.results[key] || [])) hist.push({ key, ...r });
