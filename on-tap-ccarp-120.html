@@ -346,7 +346,7 @@ span.cuelab { display: inline-block; margin-left: .35em; font: 700 12px/1.4 var(
 @media print { .examtabs { display: none; } }
 .examtabs .sep { width: 1px; align-self: stretch; background: #2a3a58; margin: 2px 10px; flex: none; }
 </style>
-<nav class="examtabs" aria-label="Chọn kỳ thi"><div class="in"><span class="lb">Kỳ thi:</span><a href="ccar-f-mock-exam.html">CCAR-F</a><a href="ccdv-f-mock-exam.html">CCDV-F</a><a href="ccar-p-mock-exam.html" aria-current="page">CCAR-P</a><span class="sep"></span><span class="lb">CCAR-P:</span><a href="ccar-p-mock-exam.html">Thi thử</a><a href="on-tap-ccarp-120.html" aria-current="page">Khóa ôn 120 câu</a></div></nav>
+<nav class="examtabs" aria-label="Chọn kỳ thi"><div class="in"><span class="lb">Kỳ thi:</span><a href="ccar-f-mock-exam.html">CCAR-F</a><a href="ccdv-f-mock-exam.html">CCDV-F</a><a href="ccar-p-mock-exam.html" aria-current="page">CCAR-P</a><span class="sep"></span><span class="lb">CCAR-P:</span><a href="ccar-p-mock-exam.html">Thi thử</a><a href="on-tap-ccarp-120.html" aria-current="page">Khóa ôn 154 câu</a></div></nav>
 
 <div id="app"></div>
 
@@ -720,6 +720,7 @@ COURSE_CH.forEach(c => {
 const C_KIND = {
   Y: { mark: "Yes/No", card: "Chọn Yes hoặc No cho từng phát biểu", scen: "Câu Yes/No: mỗi dòng chấm riêng, phải đúng tất cả." },
   D: { mark: "Phân loại", card: "Chọn nhóm cho từng mục bằng dropdown", scen: "Câu phân loại: mỗi mục chọn một nhóm, phải đúng tất cả." },
+  N: { mark: "Câu mới", card: "34 câu mới bổ sung (#121–#154), trộn mọi chủ đề", scen: "Câu mới bổ sung: các câu này vẫn nằm trong chương chủ đề gốc, ở đây gom lại để ôn riêng." },
 };
 [
   { id: COURSE_CH.length + 1, kind: "Y", title: "Dạng câu Yes/No", name: "Câu Yes/No", f: q => q.yn, rules: [
@@ -735,6 +736,13 @@ const C_KIND = {
     "Token: <b>cắt / tóm tắt dữ liệu đưa vào</b> → <b>Input Preparation</b>; <b>sắp thứ tự prompt, prefix cache</b> → <b>Prompt Construction</b>; <b>kiểm và lưu output</b> → <b>Output Handling</b>.",
     "Chunking: theo <b>mục / đoạn văn, cấu trúc tài liệu</b> → <b>Long Structured Documents</b>; <b>mỗi bản ghi một chunk</b>, fixed-size cho bản ghi ngắn → <b>Heterogeneous Short Records</b>; theo <b>hàm / cây phân cấp</b> → <b>Code or Hierarchical Specifications</b>.",
     "Phải xếp đúng <b>tất cả</b> các mục mới được tính điểm.",
+  ] },
+  { id: COURSE_CH.length + 3, kind: "N", title: "34 câu mới bổ sung", name: "Câu mới", f: q => q.n > 120, rules: [
+    "Các câu này lấy từ bộ đề CCAR-P luyện tập (câu gốc #121–#154). Mỗi câu vẫn nằm trong chương chủ đề gốc, chương này gom lại để ôn riêng.",
+    "Nội dung, prompt cache lặp lại → <b>prompt caching</b>; muốn ít token ở lượt dễ mà không đổi model → <b>hạ effort</b>; xoá kết quả tool cũ → <b>context editing</b> (clear_tool_uses); nhớ qua nhiều phiên → <b>memory tool</b>.",
+    "Cần trích <b>đúng câu</b> trong tài liệu → <b>Citations</b>; kết quả RAG, kho nội bộ kèm nguồn → <b>search result blocks</b>; tài liệu dài hay bịa → <b>trích nguyên văn trước, phân tích sau</b>.",
+    "Claude Code: skill có side effect → <b>disable-model-invocation: true</b>; CI không người duyệt → <b>dontAsk</b>; luôn hỏi người kể cả bypassPermissions → <b>PreToolUse hook</b> trả \"ask\"; telemetry không ra → <b>chưa chọn exporter</b>; key trong settings.json → <b>secret store</b>.",
+    "Đánh giá: tiêu chí <b>SMART</b> (có số, khả thi); chốt prompt → kiểm trên <b>held-out test set</b>; ưu tiên đã ghi (accuracy trước) thì <b>làm đúng thứ tự đó</b>; chi phí tăng → <b>Usage and Cost Admin API</b>.",
   ] },
 ].forEach(x => {
   const c = { id: x.id, title: x.title, rules: x.rules, kind: x.kind, lessons: [] };
@@ -838,7 +846,7 @@ function courseHome() {
   return `<div class="hero"><div class="wrap">
       <div class="eyebrow">CCAR-P practice · Khóa ôn</div>
       <h1>Khóa ôn ${COURSE_Q.length} câu</h1>
-      <p class="lead">${COURSE_Q.length} câu luyện tập chia thành ${COURSE_CH.filter(c => !c.kind).length} chương theo chủ đề, thêm ${COURSE_CH.filter(c => c.kind).length} chương luyện riêng dạng câu Yes/No và câu phân loại (dropdown). Mỗi chương có <b>quy tắc cần nhớ</b>, bài <b>câu dễ</b> (không có phương án gây nhiễu, hoặc đề/đáp án ngắn dễ nhớ) và bài <b>câu khó</b>. Thứ tự câu và đáp án được đảo mỗi lần mở.</p>
+      <p class="lead">${COURSE_Q.length} câu luyện tập chia thành ${COURSE_CH.filter(c => !c.kind).length} chương theo chủ đề, thêm ${COURSE_CH.filter(c => c.kind).length} chương luyện riêng (dạng câu Yes/No, câu phân loại dropdown, và 34 câu mới bổ sung). Mỗi chương có <b>quy tắc cần nhớ</b>, bài <b>câu dễ</b> (không có phương án gây nhiễu, hoặc đề/đáp án ngắn dễ nhớ) và bài <b>câu khó</b>. Thứ tự câu và đáp án được đảo mỗi lần mở.</p>
       <ul class="herofacts"><li><b>${COURSE_Q.length}</b>câu</li><li><b>${COURSE_CH.length}</b>chương</li><li><b>${COURSE_Q.filter(cIsEasy).length}</b>câu dễ</li><li><b>${COURSE_Q.filter(q => !cIsEasy(q)).length}</b>câu khó</li><li><b>${cSum(C_LESSONS).k}/${C_LESSONS.length}</b>bài đã học</li></ul>
       <div class="actions">
         ${last ? `<button class="btn primary" ${cAttr({ v: "q", l: last.id, i: Math.min(CS.last.i, cOrder[last.id].length - 1) })}>Học tiếp: Chương ${last.ch.id} · ${esc(last.name)}</button>` : `<button class="btn primary" ${cAttr({ v: "ch", c: 1 })}>Bắt đầu Chương 1</button>`}
